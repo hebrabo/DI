@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="20dp"
+    tools:context=".NewPlayer">
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/newplayer">
+
+        <!-- Fila de usuario -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <!-- Icono de usuario -->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/baseline_person_24" />
+
+            <!-- Contenedor vertical de los EditText -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+                <!-- Nombre del jugador -->
+                <EditText
+                    android:id="@+id/editTextName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPersonName"
+                    android:textSize="20sp"
+                    android:hint="Name" />
+
+                <!-- Nombre fonético -->
+                <EditText
+                    android:id="@+id/editTextPhoneticName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:inputType="textPersonName"
+                    android:hint="Phonetic Name" />
+
+                <!-- Nickname -->
+                <EditText
+                    android:id="@+id/editTextNickname"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:inputType="textPersonName"
+                    android:hint="Nickname" />
+            </LinearLayout>
+        </TableRow>
+
+        <!-- Fila de foto -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+        <!-- Icono de la foto -->
+        <ImageView
+            android:id="@+id/iconoPhoto"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_camera" />
+
+        <ImageView
+            android:id="@+id/photoView"
+            android:scaleType="centerCrop"
+            android:layout_margin="8dp"
+            android:background="@color/design_default_color_background"
+            android:src="@drawable/imagen" />
+
+            <Button
+                android:id="@+id/buttonChange"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="CHANGE" />
+        </TableRow>
+
+        <!-- Fila de teléfono -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <!-- Icono del teléfono -->
+            <ImageView
+                android:id="@+id/iconPhone"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_phone" />
+
+            <!-- Contenedor vertical del teléfono -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:layout_marginStart="8dp">
+
+            <!-- Campo Phone -->
+            <EditText
+                android:id="@+id/editTextPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_weight="1"
+                android:inputType="phone"
+                android:hint="Phone" />
+
+                <!-- Spinner Phone -->
+                <Spinner
+                    android:id="@+id/spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" />
+
+            </LinearLayout>
+        </TableRow>
+
+        <!-- Fila email -->
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="8dp">
+
+            <!-- Icono de email -->
+            <ImageView
+                android:id="@+id/iconEmail"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/ic_mail" />
+
+            <!-- Campo Email -->
+            <EditText
+                android:id="@+id/editTextEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginStart="10dp"
+                android:layout_weight="1"
+                android:inputType="textEmailAddress"
+                android:hint="E-mail" />
+        </TableRow>
+
+    </TableLayout>
+</ScrollView>

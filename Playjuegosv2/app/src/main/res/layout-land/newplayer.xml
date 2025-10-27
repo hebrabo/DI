@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    tools:context=".NewPlayer">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Fila Usuario -->
+        <ImageView
+            android:id="@+id/iconUser"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/baseline_person_24"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <LinearLayout
+            android:id="@+id/layoutDatos"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/iconUser"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iconUser">
+
+            <EditText
+                android:id="@+id/editTextName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:hint="Name"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/editTextPhoneticName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:hint="Phonetic Name"
+                android:inputType="textPersonName" />
+
+            <EditText
+                android:id="@+id/editTextNickname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:hint="Nickname"
+                android:inputType="textPersonName" />
+        </LinearLayout>
+
+        <!-- Fila Foto -->
+        <ImageView
+            android:id="@+id/iconoPhoto"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_camera"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutDatos" />
+
+        <ImageView
+            android:id="@+id/photoView"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="8dp"
+            android:background="@android:color/darker_gray"
+            android:scaleType="centerCrop"
+            android:src="@drawable/imagen"
+            app:layout_constraintStart_toEndOf="@id/iconoPhoto"
+            app:layout_constraintTop_toTopOf="@id/iconoPhoto" />
+
+        <Button
+            android:id="@+id/buttonChange"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="CHANGE"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/photoView"
+            app:layout_constraintTop_toTopOf="@id/photoView"
+            app:layout_constraintBottom_toBottomOf="@id/photoView" />
+
+        <!-- Fila Teléfono -->
+        <ImageView
+            android:id="@+id/iconPhone"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_phone"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/photoView" />
+
+        <LinearLayout
+            android:id="@+id/layoutPhone"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            app:layout_constraintStart_toEndOf="@id/iconPhone"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/iconPhone">
+
+            <EditText
+                android:id="@+id/editTextPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Phone"
+                android:textSize="20sp"
+                android:inputType="phone" />
+
+            <Spinner
+                android:id="@+id/spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <!-- Fila Email -->
+        <ImageView
+            android:id="@+id/iconEmail"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/ic_mail"
+            android:layout_marginTop="16dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/layoutPhone" />
+
+        <EditText
+            android:id="@+id/editTextEmailAddress"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="E-mail"
+            android:inputType="textEmailAddress"
+            android:layout_marginStart="8dp"
+            android:textSize="20sp"
+            app:layout_constraintStart_toEndOf="@id/iconEmail"
+            app:layout_constraintTop_toTopOf="@id/iconEmail"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

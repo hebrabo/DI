@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Play juegos v2</string>
+    <string name="title_activity_new_player">NewPlayer</string>
+</resources>
