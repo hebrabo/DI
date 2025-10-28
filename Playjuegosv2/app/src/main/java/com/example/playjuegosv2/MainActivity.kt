@@ -41,6 +41,17 @@ class MainActivity : AppCompatActivity() {
         val jugador = findViewById<Button>(R.id.button2) as Button
 
         jugador.setOnClickListener { lanzarNewPlayer() }
+
+        // Botón Preferencies
+        val preferences = findViewById<Button>(R.id.button3) as Button
+
+        preferences.setOnClickListener { lanzarPreferences() }
+
+        // Botón Play
+        val games = findViewById<Button>(R.id.button1) as Button
+
+        games.setOnClickListener { lanzarGames() }
+
     }
 
     // Activar (inflar) el menú. Acciones al pulsar ítems del menú
@@ -49,11 +60,24 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
+    // Acciones al pulsar ítems del menú
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.getItemId()) {
-            (R.id.action_search) -> {return true}
-            (R.id.action_add) -> {return true}
-            else -> {return super.onOptionsItemSelected(item)} }
+        return when (item.itemId) {
+            R.id.action_search -> {
+                val intent = Intent(this, Chips::class.java)
+                startActivity(intent)
+                true
+            }
+            R.id.action_settings -> {
+                // No hacer nada por ahora
+                true
+            }
+            R.id.action_add -> {
+                // No hacer nada por ahora
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     // Lanzar actividad Nuevo Jugador
@@ -61,5 +85,18 @@ class MainActivity : AppCompatActivity() {
             val i = Intent(this, NewPlayer::class.java)
             startActivity(i)
         }
+
+    // Lanzar actividad Preferences
+    fun lanzarPreferences() {
+        val i = Intent(this, Preferences::class.java)
+        startActivity(i)
     }
+
+    // Lanzar actividad Games
+    fun lanzarGames() {
+        val i = Intent(this, Games::class.java)
+        startActivity(i)
+    }
+    }
+
 

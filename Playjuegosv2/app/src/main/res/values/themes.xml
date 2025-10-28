@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <style name="Theme.PlayJuegosV2" parent="Theme.MaterialComponents.DayNight.NoActionBar" >
+
+    <style name="Theme.PlayJuegosV2" parent="Theme.MaterialComponents.DayNight.NoActionBar">
         <!-- Primary brand color -->
         <item name="colorPrimary" type="color">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -11,7 +12,8 @@
         <item name="colorOnPrimary">@color/black</item>
         <!-- Status brand color -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
-</style>
+    </style>
+
     <style name="Myestilo">
         <item name="android:background">@color/purple_200</item>
     </style>

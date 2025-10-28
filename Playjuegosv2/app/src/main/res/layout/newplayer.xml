@@ -43,31 +43,46 @@
                 android:layout_marginStart="8dp">
 
                 <!-- Nombre del jugador -->
-                <EditText
-                    android:id="@+id/editTextName"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:textSize="20sp"
-                    android:hint="Name" />
+                    android:hint="Name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textSize="20sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Nombre fonético -->
-                <EditText
-                    android:id="@+id/editTextPhoneticName"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:inputType="textPersonName"
-                    android:hint="Phonetic Name" />
+                    android:hint="Phonetic Name">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextPhoneticName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textSize="20sp" />
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <!-- Nickname -->
-                <EditText
-                    android:id="@+id/editTextNickname"
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="20sp"
-                    android:inputType="textPersonName"
-                    android:hint="Nickname" />
+                    android:hint="Nickname">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/editTextNickname"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:textSize="20sp" />
+                </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </TableRow>
 
@@ -123,14 +138,14 @@
                 android:layout_marginStart="8dp">
 
             <!-- Campo Phone -->
-            <EditText
-                android:id="@+id/editTextPhone"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_weight="1"
-                android:inputType="phone"
-                android:hint="Phone" />
+                <EditText
+                    android:id="@+id/editTextPhone"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="20sp"
+                    android:layout_weight="1"
+                    android:inputType="phone"
+                    android:hint="Phone" />
 
                 <!-- Spinner Phone -->
                 <Spinner
@@ -143,12 +158,12 @@
         </TableRow>
 
         <!-- Fila email -->
-        <TableRow
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
             android:padding="8dp">
 
-            <!-- Icono de email -->
             <ImageView
                 android:id="@+id/iconEmail"
                 android:layout_width="48dp"
@@ -156,17 +171,20 @@
                 android:scaleType="centerCrop"
                 android:src="@drawable/ic_mail" />
 
-            <!-- Campo Email -->
-            <EditText
-                android:id="@+id/editTextEmailAddress"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="20sp"
-                android:layout_marginStart="10dp"
-                android:layout_weight="1"
-                android:inputType="textEmailAddress"
-                android:hint="E-mail" />
-        </TableRow>
+                android:layout_marginStart="8dp"
+                android:hint="E-mail">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextEmailAddress"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textEmailAddress"
+                    android:textSize="20sp" />
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
 
     </TableLayout>
     </LinearLayout>

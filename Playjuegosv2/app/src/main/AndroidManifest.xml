@@ -12,6 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PlayJuegosV2">
         <activity
+            android:name=".Chips"
+            android:exported="false"
+            android:label="@string/title_activity_chips"
+            android:theme="@style/Theme.PlayJuegosV2" />
+        <activity
+            android:name=".Games"
+            android:exported="false"
+            android:label="@string/title_activity_games"
+            android:theme="@style/Theme.PlayJuegosV2" />
+        <activity
+            android:name=".Preferences"
+            android:exported="false"
+            android:label="@string/title_activity_preferences"
+            android:theme="@style/Theme.PlayJuegosV2" />
+        <activity
             android:name=".NewPlayer"
             android:exported="false"
             android:label="@string/title_activity_new_player"
