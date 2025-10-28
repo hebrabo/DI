@@ -2,9 +2,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_margin="50dp"
-    android:gravity="center_vertical">
+    android:orientation="vertical">
+
+    <include layout="@layout/toolbar_layout"></include>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_margin="50dp"
+        android:gravity="center_vertical">
 
     <TextView
         android:id="@+id/titulo"
@@ -43,4 +50,5 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:text="ABOUT" />
+</LinearLayout>
 </LinearLayout>

@@ -4,12 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+
     tools:context=".NewPlayer">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    <include layout="@layout/toolbar_layout"></include>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
+
 
         <!-- Fila Usuario -->
         <ImageView
@@ -78,13 +87,14 @@
 
         <Button
             android:id="@+id/buttonChange"
+            style="@style/Myestilo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="CHANGE"
             android:layout_marginStart="8dp"
+            android:text="CHANGE"
+            app:layout_constraintBottom_toBottomOf="@id/photoView"
             app:layout_constraintStart_toEndOf="@id/photoView"
-            app:layout_constraintTop_toTopOf="@id/photoView"
-            app:layout_constraintBottom_toBottomOf="@id/photoView" />
+            app:layout_constraintTop_toTopOf="@id/photoView" />
 
         <!-- Fila Teléfono -->
         <ImageView
@@ -143,4 +153,5 @@
             app:layout_constraintEnd_toEndOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+    </LinearLayout>
 </ScrollView>
