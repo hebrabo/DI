@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/opcion_renombrar"
+        android:title="Renombrar" />
+
+    <item
+        android:id="@+id/opcion_duplicar"
+        android:title="Duplicar" />
+
+    <item
+        android:id="@+id/opcion_eliminar"
+        android:title="Eliminar" />
+
+    <item
+        android:id="@+id/opcion_mover"
+        android:title="Mover" />
+
+</menu>

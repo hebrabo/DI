@@ -1,0 +1,107 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <!-- AutoCompleteTextView para seleccionar planeta 1 -->
+    <AutoCompleteTextView
+        android:id="@+id/autoPlaneta1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Selecciona primer planeta"
+        android:inputType="text"
+        android:focusable="true"
+        android:clickable="true" />
+
+    <!-- AutoCompleteTextView para seleccionar planeta 2 -->
+    <AutoCompleteTextView
+        android:id="@+id/autoPlaneta2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Selecciona segundo planeta"
+        android:inputType="text"
+        android:focusable="true"
+        android:clickable="true"
+        android:layout_marginTop="8dp"/>
+
+    <!-- Tabla comparativa -->
+    <TableLayout
+        android:id="@+id/tableComparativa"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stretchColumns="*"
+        android:layout_marginTop="16dp">
+
+        <!-- Encabezados -->
+        <TableRow>
+            <TextView
+                android:text=""
+                android:background="#FFFFFF"
+                android:padding="8dp"/>
+            <TextView
+                android:id="@+id/colPlaneta1"
+                android:text="Planeta 1"
+                android:background="#9C27B0"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:padding="5dp"/>
+            <TextView
+                android:id="@+id/colPlaneta2"
+                android:text="Planeta 2"
+                android:background="#9C27B0"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:padding="5dp"/>
+        </TableRow>
+
+        <!-- Diámetro -->
+        <TableRow>
+            <TextView
+                android:text="Diámetro"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+            <TextView
+                android:id="@+id/diametro1"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+            <TextView
+                android:id="@+id/diametro2"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+        </TableRow>
+
+        <!-- Distancia al Sol -->
+        <TableRow>
+            <TextView
+                android:text="Distancia al Sol"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+            <TextView
+                android:id="@+id/distancia1"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+            <TextView
+                android:id="@+id/distancia2"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+        </TableRow>
+
+        <!-- Densidad -->
+        <TableRow>
+            <TextView
+                android:text="Densidad"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+            <TextView
+                android:id="@+id/densidad1"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+            <TextView
+                android:id="@+id/densidad2"
+                android:padding="8dp"
+                android:background="#E1BEE7"/>
+        </TableRow>
+
+    </TableLayout>
+</LinearLayout>
