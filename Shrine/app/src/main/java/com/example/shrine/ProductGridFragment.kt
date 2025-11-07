@@ -1,8 +1,11 @@
 package com.example.shrine
 
+import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.shrine.databinding.ShrProductGridFragmentBinding
@@ -27,6 +30,17 @@ class ProductGridFragment : Fragment() {
         // Configura la Toolbar
         (activity as AppCompatActivity).setSupportActionBar(binding.appBar)
 
+       // Configura el NavigationIconClickListener
+        binding.appBar.setNavigationOnClickListener(
+            NavigationIconClickListener(
+                requireActivity(),
+                binding.productGrid,
+                AccelerateDecelerateInterpolator(),
+                ContextCompat.getDrawable(requireContext(), R.drawable.shr_branded_menu), // Ícono menú abierto
+                ContextCompat.getDrawable(requireContext(), R.drawable.shr_close_menu)    // Ícono menú cerrado
+            )
+        )
+
         // Configura el RecyclerView con diseño escalonado
         binding.recyclerView.setHasFixedSize(true)
         val gridLayoutManager = GridLayoutManager(context, 2, GridLayoutManager.HORIZONTAL, false)
@@ -48,6 +62,12 @@ class ProductGridFragment : Fragment() {
         val largePadding = resources.getDimensionPixelSize(R.dimen.shr_staggered_product_grid_spacing_large)
         val smallPadding = resources.getDimensionPixelSize(R.dimen.shr_staggered_product_grid_spacing_small)
         binding.recyclerView.addItemDecoration(ProductGridItemDecoration(largePadding, smallPadding))
+
+        // Set cut corner background para API 23+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            binding.productGrid.background =
+                context?.getDrawable(R.drawable.shr_product_grid_background_shape)
+        }
 
         return binding.root
     }

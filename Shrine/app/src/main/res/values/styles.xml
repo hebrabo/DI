@@ -30,7 +30,7 @@
     </style>
 
     <style name="Widget.Shrine.Button.TextButton" parent="Widget.MaterialComponents.Button.TextButton">
-        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textColor">@color/textColorPrimary</item>
     </style>
     <style name="Widget.Shrine.Toolbar" parent="Widget.AppCompat.Toolbar">
         <item name="android:background">?attr/colorAccent</item>
@@ -49,6 +49,8 @@
         <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
-
+    <style name="Widget.Shrine.Backdrop" parent="">
+        <item name="android:background">?attr/colorAccent</item>
+    </style>
 
 </resources>
