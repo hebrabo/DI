@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.shrine.databinding.ShrProductGridFragmentBinding
 import com.example.shrine.network.ProductEntry
+import com.example.shrine.staggeredgridlayout.StaggeredProductCardRecyclerViewAdapter
 
 class ProductGridFragment : Fragment() {
 
@@ -26,16 +27,26 @@ class ProductGridFragment : Fragment() {
         // Configura la Toolbar
         (activity as AppCompatActivity).setSupportActionBar(binding.appBar)
 
-        // Configura el RecyclerView
+        // Configura el RecyclerView con diseño escalonado
         binding.recyclerView.setHasFixedSize(true)
-        binding.recyclerView.layoutManager = GridLayoutManager(context, 2)
-        val adapter = ProductCardRecyclerViewAdapter(
+        val gridLayoutManager = GridLayoutManager(context, 2, GridLayoutManager.HORIZONTAL, false)
+        gridLayoutManager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup() {
+            override fun getSpanSize(position: Int): Int {
+                // Cada tercer item ocupa 2 spans para el efecto escalonado
+                return if (position % 3 == 2) 2 else 1
+            }
+        }
+        binding.recyclerView.layoutManager = gridLayoutManager
+
+        // Asigna el adaptador escalonado
+        val adapter = StaggeredProductCardRecyclerViewAdapter(
             ProductEntry.initProductEntryList(resources)
         )
         binding.recyclerView.adapter = adapter
 
-        val largePadding = resources.getDimensionPixelSize(R.dimen.shr_product_grid_spacing)
-        val smallPadding = resources.getDimensionPixelSize(R.dimen.shr_product_grid_spacing_small)
+        // Configura los espacios entre items
+        val largePadding = resources.getDimensionPixelSize(R.dimen.shr_staggered_product_grid_spacing_large)
+        val smallPadding = resources.getDimensionPixelSize(R.dimen.shr_staggered_product_grid_spacing_small)
         binding.recyclerView.addItemDecoration(ProductGridItemDecoration(largePadding, smallPadding))
 
         return binding.root
@@ -51,4 +62,5 @@ class ProductGridFragment : Fragment() {
         _binding = null
     }
 }
+
 
