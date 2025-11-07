@@ -3,6 +3,7 @@ package com.example.shrine
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.shrine.network.ImageRequester
 import com.example.shrine.network.ProductEntry
 
 /**
@@ -16,7 +17,12 @@ class ProductCardRecyclerViewAdapter(private val productList: List<ProductEntry>
     }
 
     override fun onBindViewHolder(holder: ProductCardViewHolder, position: Int) {
-        // TODO: Put ViewHolder binding code here in MDC-102
+        if (position < productList.size) {
+            val product = productList[position]
+            holder.productTitle.text = product.title
+            holder.productPrice.text = product.price
+            ImageRequester.setImageFromUrl(holder.productImage, product.url)
+        }
     }
 
     override fun getItemCount(): Int {
