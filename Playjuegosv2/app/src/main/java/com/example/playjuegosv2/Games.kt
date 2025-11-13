@@ -20,6 +20,8 @@ class Games : AppCompatActivity() {
         val toolbar = findViewById(R.id.toolbar_games) as Toolbar
         setSupportActionBar(toolbar)
 
+        
+
         // Referencia al FAB
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         // Referencias a los CheckBox
