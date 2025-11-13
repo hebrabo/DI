@@ -1,21 +1,28 @@
 package com.example.palette
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.transition.Slide
+import android.view.Gravity
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityOptionsCompat
 import androidx.palette.graphics.Palette
 
 
 // Pantalla principal donde se muestran las tarjetas con imágenes.
 class MainActivity : AppCompatActivity() {
 
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -62,7 +69,17 @@ class MainActivity : AppCompatActivity() {
                 // Abrir nueva pantalla (DetalleActivity) pasando la imagen seleccionada
                 val intent = Intent(this, DetalleActivity::class.java)
                 intent.putExtra("imagen", tarjeta.imagen)
-                startActivity(intent)
+
+                // Elemento compartido: imagen dentro del item clickeado
+                val imageView = view.findViewById<View>(R.id.imgCard)
+
+                val options = ActivityOptionsCompat.makeSceneTransitionAnimation(
+                    this,
+                    imageView,
+                    "sharedImage"
+                )
+                window.exitTransition = Slide(Gravity.END)
+                startActivity(intent, options.toBundle())
             }
         }
     }

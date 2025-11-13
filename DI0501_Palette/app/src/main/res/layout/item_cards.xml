@@ -10,10 +10,11 @@
     android:layout_height="wrap_content">
 
         <ImageView
-            android:id="@+id/image1"
+            android:id="@+id/imgCard"
             android:layout_width="match_parent"
             android:layout_height="300dp"
-            android:transitionName="tranphoto"
-            android:scaleType="centerCrop"/>
+            android:transitionName="sharedImage"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/imgCard"/>
 
 </androidx.cardview.widget.CardView>

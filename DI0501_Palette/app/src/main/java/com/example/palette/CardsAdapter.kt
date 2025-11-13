@@ -23,7 +23,7 @@ class CardsAdapter(var items: ArrayList<Tarjeta>) : RecyclerView.Adapter<CardsAd
         var imagen: ImageView
 
         init {
-            imagen = itemView.findViewById(R.id.image1) // ImageView de la tarjeta
+            imagen = itemView.findViewById(R.id.imgCard) // ImageView de la tarjeta
         }
 
         // Asignar datos de la tarjeta y el click listener

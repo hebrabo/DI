@@ -3,17 +3,28 @@ package com.example.palette
 import android.graphics.BitmapFactory
 import android.os.Build
 import android.os.Bundle
+import android.transition.Fade
+import android.transition.Slide
+import android.transition.TransitionInflater
+import android.view.Gravity
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.content.ContextCompat
 import androidx.palette.graphics.Palette
+import androidx.transition.ChangeImageTransform
+
 
 // Muestra la imagen seleccionada y sus colores extraídos con Palette
 class DetalleActivity : AppCompatActivity() {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     override fun onCreate(savedInstanceState: Bundle?) {
+        window.enterTransition = Fade()
+        window.exitTransition = Slide(Gravity.END)
+        window.sharedElementEnterTransition = TransitionInflater.from(this)
+            .inflateTransition(R.transition.change_image_transform)
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detalle)
 
