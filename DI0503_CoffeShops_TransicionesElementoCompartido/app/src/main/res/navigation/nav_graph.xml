@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    NAVIGATION GRAPH
+    Este archivo describe TODA la navegación entre fragments de la app.
+    - Cada <fragment> representa una pantalla
+    - Cada <action> representa una transición entre pantallas
+    - Aquí también puedes definir animaciones, argumentos, deep links, etc.
+-->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    app:startDestination="@id/mainFragment">
+
+    <!--
+        MAIN FRAGMENT
+        Este es el fragment principal que contiene el RecyclerView.
+        tools:layout solo sirve en tiempo de diseño (no afecta al runtime).
+    -->
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.coffeshops.MainFragment"
+        tools:layout="@layout/fragment_main">
+
+        <!--
+                ACTION: mainFragment → cafeteriaFragment
+                Esta acción define que al pulsar un elemento se navega al otro fragment.
+
+                También se aplican las ANIMACIONES:
+                - enterAnim: animación cuando aparece cafeteriaFragment
+                - exitAnim: animación cuando mainFragment desaparece
+                - popEnterAnim: animación al volver atrás (cafeteria → main)
+                - popExitAnim: animación al cerrar cafeteriaFragment
+            -->
+        <action
+            android:id="@+id/action_mainFragment_to_cafeteriaFragment"
+            app:destination="@id/cafeteriaFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_right"
+            app:popExitAnim="@anim/slide_out_left" />
+    </fragment>
+
+    <!--
+        CAFETERIA FRAGMENT
+        Muestra detalles de la cafetería seleccionada.
+        También tiene el nombre que recibe mediante argumentos.
+    -->
+    <fragment
+        android:id="@+id/cafeteriaFragment"
+        android:name="com.example.coffeshops.CafeteriaFragment"
+        tools:layout="@layout/fragment_cafeteria" />
+
+</navigation>
+
+

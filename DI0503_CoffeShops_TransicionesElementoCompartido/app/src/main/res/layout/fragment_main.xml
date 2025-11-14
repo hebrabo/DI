@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+    LAYOUT PRINCIPAL DEL MAINFRAGMENT
+    Este layout contiene únicamente un RecyclerView dentro de un LinearLayout.
+    El RecyclerView mostrará la lista de cafeterías usando el CoffeAdapter.
+-->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!--
+        RECYCLERVIEW
+        Aquí se mostrarán las tarjetas (card_item.xml) de cada cafetería.
+        - Se llena mediante un LayoutManager (en este caso LinearLayoutManager)
+        - El adapter (CoffeAdapter) controla cómo se dibuja cada ítem
+    -->
+<androidx.recyclerview.widget.RecyclerView
+android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+
+    </LinearLayout>
+

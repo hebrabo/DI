@@ -1,0 +1,27 @@
+<!--
+    ANIMACIÓN: slide_out_left.xml
+    Hace que una vista o fragmento *salga* deslizándose hacia la izquierda.
+
+    Se usa en transiciones de Navigation, por ejemplo:
+        app:exitAnim="@anim/slide_out_left"
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        translate
+        Mueve la vista a lo largo del eje X.
+
+        android:fromXDelta="0%"
+            → La animación empieza en la posición normal de la vista.
+
+        android:toXDelta="-100%"
+            → La vista termina desplazada un 100% de su ancho hacia la izquierda,
+              es decir, completamente fuera de la pantalla.
+
+        android:duration="300"
+            → Duración de la animación: 300 milisegundos (0.3 s).
+    -->
+    <translate
+        android:fromXDelta="0%"
+        android:toXDelta="-100%"
+        android:duration="300"/>
+</set>

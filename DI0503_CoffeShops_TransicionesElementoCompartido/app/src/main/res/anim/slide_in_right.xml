@@ -1,0 +1,29 @@
+<!--
+    ANIMACIÓN: slide_in_right.xml
+    Este archivo define una animación de *deslizamiento* que hace que
+    una vista o fragmento entre desde la derecha hacia su posición normal.
+
+    Se utiliza normalmente en transiciones de fragments en Navigation,
+    referenciándolo con:
+        app:enterAnim="@anim/slide_in_right"
+-->
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <!--
+        translate
+        Indica un movimiento en el eje X o Y.
+
+        android:fromXDelta="100%"
+            → El elemento comienza FUERA de la pantalla, desplazado
+              el 100% de su ancho hacia la derecha.
+
+        android:toXDelta="0%"
+            → Termina exactamente donde debería estar (posición normal).
+
+        android:duration="300"
+            → Duración de la animación en milisegundos (0.3 s).
+    -->
+    <translate
+        android:fromXDelta="100%"
+        android:toXDelta="0%"
+        android:duration="300"/>
+</set>
