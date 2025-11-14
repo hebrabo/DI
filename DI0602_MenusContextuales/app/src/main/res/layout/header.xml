@@ -3,12 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="200dp">
 
+    <!-- Imagen de cabecera -->
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
         android:src="@drawable/headerphoto" />
 
+    <!-- Texto superpuesto sobre la imagen -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

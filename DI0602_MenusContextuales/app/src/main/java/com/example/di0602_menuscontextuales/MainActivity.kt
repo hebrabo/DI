@@ -10,6 +10,10 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.navigation.NavigationView
 
+/**
+ * MainActivity que sirve como contenedor principal de la aplicación.
+ * Maneja el DrawerLayout, Toolbar y la navegación entre fragments.
+ */
 class MainActivity : AppCompatActivity() {
 
     private lateinit var drawerLayout: DrawerLayout
@@ -20,39 +24,41 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // Toolbar
+        // Configuración de la Toolbar
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // DrawerLayout
+        // Referencia al DrawerLayout para poder abrir/cerrar el menú lateral
         drawerLayout = findViewById(R.id.drawer_layout)
 
-        // NavController
+        // Obtenemos el NavController a través del NavHostFragment
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         navController = navHostFragment.navController
 
-        // AppBarConfiguration con DrawerLayout y destinos top-level
+        // Configuración de AppBar con destinos top-level y DrawerLayout
         appBarConfiguration = AppBarConfiguration(
             setOf(
-                R.id.nav_home, // tu primer fragmento
-                R.id.nav_gallery // otro fragmento
-                // agrega aquí todos los destinos top-level de tu nav_graph
+                R.id.nav_home,    // Fragmento "Home" es top-level
+                R.id.nav_gallery  // Fragmento "Gallery" es top-level
+                // Agregar más destinos top-level según sea necesario
             ),
             drawerLayout
         )
 
-        // Configurar Toolbar con NavController
+        // Conectar Toolbar con NavController para manejar título y botón "hamburguesa"
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration)
 
-        // NavigationView (menú lateral)
+        // Configurar NavigationView (menú lateral) con el NavController
         val navView: NavigationView = findViewById(R.id.nav_view)
         NavigationUI.setupWithNavController(navView, navController)
     }
 
-    // Permite que el botón "hamburguesa" abra/cierre el Drawer
+    /**
+     * Permite que el botón "hamburguesa" abra/cierre el Drawer
+     * cuando se presiona en la Toolbar
+     */
     override fun onSupportNavigateUp(): Boolean {
         return NavigationUI.navigateUp(navController, appBarConfiguration)
     }
 }
-

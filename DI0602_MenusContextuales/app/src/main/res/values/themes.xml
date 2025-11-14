@@ -8,7 +8,12 @@
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorSecondary">@color/teal_200</item>
         <item name="colorOnSecondary">@color/black</item>
+
+        <!-- AcciónMode reemplaza la Toolbar -->
+        <item name="actionModeBackground">@color/purple_200</item> <!-- mismo color que la Toolbar -->
+        <item name="windowActionModeOverlay">true</item>
     </style>
 </resources>
+
 
 

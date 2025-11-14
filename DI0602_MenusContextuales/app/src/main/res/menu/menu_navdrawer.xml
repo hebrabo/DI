@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Grupo de items con selección única -->
     <group android:checkableBehavior="single">
+
+        <!-- Opción Home -->
         <item
             android:id="@+id/nav_home"
             android:icon="@drawable/ic_home"
             android:title="Home" />
+
+        <!-- Opción Gallery -->
         <item
             android:id="@+id/nav_gallery"
             android:icon="@drawable/ic_gallery"
             android:title="Gallery" />
+
+        <!-- Opción Slideshow -->
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/ic_slideshow"

@@ -5,18 +5,21 @@
     android:id="@+id/mobile_navigation"
     app:startDestination="@id/nav_home">
 
+    <!-- Fragmento Home: punto de inicio de la navegación -->
     <fragment
         android:id="@+id/nav_home"
         android:name="com.example.di0602_menuscontextuales.HomeFragment"
         android:label="Home"
         tools:layout="@layout/fragment_home"/>
 
+    <!-- Fragmento Gallery: contiene el RecyclerView de fotos -->
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.example.di0602_menuscontextuales.GalleryFragment"
         android:label="Gallery"
         tools:layout="@layout/fragment_gallery"/>
 
+    <!-- Fragmento Slideshow -->
     <fragment
         android:id="@+id/nav_slideshow"
         android:name="com.example.di0602_menuscontextuales.SlideshowFragment"
