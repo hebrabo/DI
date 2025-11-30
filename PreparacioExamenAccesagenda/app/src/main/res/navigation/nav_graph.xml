@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="com.example.accesagenda.ui.LoginFragment"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_loginFragment_to_homeFragment"
+            app:destination="@id/homeFragment"
+            app:popUpTo="@id/loginFragment"
+            app:popUpToInclusive="true"/>
+    </fragment>
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.example.accesagenda.ui.home.HomeFragment"
+        tools:layout="@layout/fragment_home">
+
+        <action
+            android:id="@+id/action_homeFragment_to_activityDetailFragment"
+            app:destination="@id/activityDetailFragment" />
+
+        <action
+            android:id="@+id/action_homeFragment_to_socialFeedFragment"
+            app:destination="@id/socialFeedFragment" />
+
+    </fragment>
+
+    <fragment
+        android:id="@+id/calendarFragment"
+        android:name="com.example.accesagenda.ui.CalendarFragment"
+        tools:layout="@layout/fragment_calendar" />
+
+    <fragment
+        android:id="@+id/agendaFragment"
+        android:name="com.example.accesagenda.ui.AgendaFragment"
+        tools:layout="@layout/fragment_agenda" />
+
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.example.accesagenda.ui.ProfileFragment"
+        tools:layout="@layout/fragment_profile" />
+
+    <fragment
+        android:id="@+id/activityDetailFragment"
+        android:name="com.example.accesagenda.ui.ActivityDetailFragment"
+        tools:layout="@layout/fragment_activity_detail" />
+
+    <fragment
+        android:id="@+id/socialFeedFragment"
+        android:name="com.example.accesagenda.ui.SocialFeedFragment"
+        tools:layout="@layout/fragment_social_feed" />
+
+</navigation>

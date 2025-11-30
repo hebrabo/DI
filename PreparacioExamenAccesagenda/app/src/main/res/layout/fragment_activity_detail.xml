@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    tools:context=".ui.ActivityDetailFragment">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:elevation="0dp">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbarDetail"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:contentInsetStartWithNavigation="0dp"
+            app:layout_scrollFlags="scroll|enterAlways" >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingEnd="16dp">
+
+                <TextView
+                    android:id="@+id/tvActivityTitleLocation"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Salida con Amigos • 29 de sep • MOMO Cafe"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:drawableStart="@drawable/ic_search_black_24dp"
+                    android:drawablePadding="8dp"
+                    android:background="@drawable/bg_search_outline"/>
+
+                <ImageView
+                    android:id="@+id/ivEditIcon"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginStart="8dp"
+                    android:src="@drawable/ic_edit_24dp"
+                    app:tint="@color/black"
+                    android:contentDescription="Editar Actividad" />
+            </LinearLayout>
+        </androidx.appcompat.widget.Toolbar>
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:id="@+id/dropdownFilter"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="8dp"
+                    android:background="@drawable/bg_outline_dropdown"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:layout_marginEnd="8dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Filtrar"
+                        android:textSize="12sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_down_24dp"
+                        android:layout_marginStart="4dp"
+                        app:tint="@color/black"
+                        android:contentDescription="Icono de desplegable" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/dropdownSort"
+                    android:layout_width="wrap_content"
+                    android:layout_height="38dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="8dp"
+                    android:background="@drawable/bg_outline_dropdown"
+                    android:clickable="true"
+                    android:focusable="true">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ordenar"
+                        android:textSize="12sp"
+                        android:textColor="@color/black"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_arrow_down_24dp"
+                        android:layout_marginStart="4dp"
+                        app:tint="@color/black"
+                        android:contentDescription="Icono de desplegable" />
+
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginStart="8dp"
+                    android:layout_weight="1"
+                    android:src="@drawable/codigoqr"
+                    android:contentDescription="Código QR"
+                    android:scaleType="fitCenter"/>
+
+            </LinearLayout>
+            <ImageView
+                android:id="@+id/ivMapPlaceholder"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:layout_marginTop="16dp"
+                android:src="@drawable/mapa"
+                android:scaleType="centerCrop"
+                android:contentDescription="Mapa de Ubicación"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:id="@+id/tvPlaceName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="MOMO Coffee - Roma Norte"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/black"/>
+
+                <TextView
+                    android:id="@+id/tvPlaceDetails"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="4.8 ★★★★★ (571) · $1-100 · Cafetería"
+                    android:textSize="14sp"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/gray"/>
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/ivPlaceImage"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:scaleType="centerCrop"
+                android:src="@drawable/cafeteria"
+                android:contentDescription="Imagen exterior del lugar"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
