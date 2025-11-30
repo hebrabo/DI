@@ -1,0 +1,17 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.PlayJuegos" parent="Theme.Material3.DayNight.NoActionBar">
+        <!-- Colores principales de la nueva paleta -->
+        <item name="colorPrimary">@color/colorPrimary</item>        <!-- 3E350E -->
+        <item name="colorOnPrimary">@color/colorOnPrimary</item>    <!-- EAE9E7 -->
+
+        <item name="colorSecondary">@color/colorSecondary</item>    <!-- DAAD29 -->
+        <item name="colorOnSecondary">@color/colorOnSecondary</item><!-- 3E350E -->
+
+        <!-- Opcional pero recomendable -->
+        <item name="android:colorBackground">@color/colorBackground</item> <!-- EAE9E7 -->
+        <item name="colorSurface">@color/colorSurface</item>              <!-- F2DD6C -->
+    </style>
+
+    <style name="Theme.PlayJuegos" parent="Base.Theme.PlayJuegos" />
+</resources>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Toolbar fuera del ScrollView -->
+    <include layout="@layout/toolbar_layout"></include>
+
+    <!-- ScrollView con el formulario -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Nombre del juego -->
+            <EditText
+                android:id="@+id/editTextNombre"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Nombre del juego"
+                android:layout_marginTop="16dp"/>
+
+            <!-- Plataformas -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Plataforma"
+                android:layout_marginTop="16dp"/>
+            <Spinner
+                android:id="@+id/spinnerPlataformas"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"/>
+
+            <!-- Temática / descripción -->
+            <EditText
+                android:id="@+id/editTextTematica"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Descripción del juego"
+                android:layout_marginTop="16dp"
+                android:minLines="3"
+                android:gravity="top"
+                android:inputType="textMultiLine"/>
+
+            <!-- Ganas de jugar (RatingBar) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ganas de jugar"
+                android:layout_marginTop="16dp"/>
+            <RatingBar
+                android:id="@+id/ratingBarGanas"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:numStars="5"
+                android:stepSize="1"/>
+
+            <!-- Botones -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="24dp">
+
+                <Button
+                    android:id="@+id/buttonCancelar"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorSecondary"
+                    android:text="Cancelar"/>
+
+                <Button
+                    android:id="@+id/buttonEnviar"
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@color/colorSecondary"
+                    android:text="Enviar"
+                    android:layout_marginStart="16dp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

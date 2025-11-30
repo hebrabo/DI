@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="dark_grey">#7D7D7D</color>
+    <color name="dark_grey_plus">#535353</color>
+    <color name="grey">#AAAAAA</color>
+    <color name="blue">#00E2FA</color>
+    <color name="red">#F44236</color>
+    <color name="red_variant">#E57169</color>
+    <color name="red_variant2">#FFCDD2</color>
+
+    <!-- NUEVA PALETA DEL CLIENTE -->
+    <color name="colorPrimary">#3E350E</color>
+    <color name="colorOnPrimary">#EAE9E7</color>
+
+    <color name="colorSecondary">#DAAD29</color>
+    <color name="colorOnSecondary">#3E350E</color>
+
+    <color name="colorBackground">#EAE9E7</color>
+    <color name="colorSurface">#F2DD6C</color>
+
+    <!-- Colores adicionales de la paleta -->
+    <color name="olive">#79792E</color>
+    <color name="brown">#794515</color>
+</resources>

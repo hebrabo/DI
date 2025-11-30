@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/grey"
+    tools:context=".MainActivity" >
+
+    <include layout="@layout/toolbar_layout"></include>
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play Juegos"
+        android:layout_gravity="center"
+        android:textSize="30sp"
+        android:layout_margin="30dp"/>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grey"
+        android:layout_gravity="center"
+        android:paddingHorizontal="20dp"
+        android:gravity="center" >
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button"
+                android:backgroundTint="@color/colorSecondary"
+                android:textColor="@color/black"
+                app:cornerRadius="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:text="PLAY" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button2"
+                android:backgroundTint="@color/colorSecondary"
+                android:textColor="@color/black"
+                app:cornerRadius="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:text="NEW PLAYER" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center" >
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button3"
+                android:backgroundTint="@color/colorSecondary"
+                android:textColor="@color/black"
+                app:cornerRadius="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:text="PREFERENCIES" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/button4"
+                android:backgroundTint="@color/colorSecondary"
+                android:textColor="@color/black"
+                app:cornerRadius="5dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginHorizontal="10dp"
+                android:text="ABOUT" />
+
+        </TableRow>
+    </TableLayout>
+</LinearLayout>
