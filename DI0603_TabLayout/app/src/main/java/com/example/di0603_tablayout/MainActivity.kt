@@ -2,43 +2,32 @@ package com.example.di0603_tablayout
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.tabs.TabLayout
+import com.google.android.material.tabs.TabLayoutMediator
 
 class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val tabLayout: TabLayout = findViewById(R.id.tabs)
+        // Referencias
+        val tabLayout = findViewById<TabLayout>(R.id.tabs)
+        val viewPager = findViewById<ViewPager2>(R.id.view_pager)
 
-        // Cargar Fragment 1 al inicio
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.content_fragment, Fragment1())
-                .commit()
-            // Título inicial
-            supportActionBar?.title = "Tab 1"
-        }
+        // 1. Crear y asignar el adaptador al ViewPager2
+        val adapter = ViewPagerAdapter(this)
+        viewPager.adapter = adapter
 
-        tabLayout.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                val fragment = when (tab.position) {
-                    0 -> Fragment1()
-                    1 -> Fragment2() // Aquí se cargarán las tarjetas
-                    2 -> Fragment3()
-                    else -> Fragment1()
-                }
-
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.content_fragment, fragment)
-                    .commit()
-
-                // Cambiar el título de la barra superior
-                supportActionBar?.title = tab.text
+        // 2. Vincular TabLayout y ViewPager2 con TabLayoutMediator
+        // Esto se encarga de cambiar el título de la pestaña y sincronizar el swipe
+        TabLayoutMediator(tabLayout, viewPager) { tab, position ->
+            when (position) {
+                0 -> tab.text = "TAB 1"
+                1 -> tab.text = "TAB 2"
+                2 -> tab.text = "TAB 3"
             }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {}
-            override fun onTabReselected(tab: TabLayout.Tab) {}
-        })
+        }.attach() // ¡Importante llamar a attach()!
     }
 }
