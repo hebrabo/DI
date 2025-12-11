@@ -20,14 +20,18 @@ class MainActivity : AppCompatActivity() {
         val adapter = ViewPagerAdapter(this)
         viewPager.adapter = adapter
 
+        // --- ANIMACIÓN (Ejercicio 5) ---
+        // Al estar en el mismo paquete, detectará la clase automáticamente
+        viewPager.setPageTransformer(CubePageTransformer())
+        // -------------------------------
+
         // 2. Vincular TabLayout y ViewPager2 con TabLayoutMediator
-        // Esto se encarga de cambiar el título de la pestaña y sincronizar el swipe
         TabLayoutMediator(tabLayout, viewPager) { tab, position ->
             when (position) {
                 0 -> tab.text = "TAB 1"
                 1 -> tab.text = "TAB 2"
                 2 -> tab.text = "TAB 3"
             }
-        }.attach() // ¡Importante llamar a attach()!
+        }.attach()
     }
 }
