@@ -60,7 +60,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FabPosition // Importante para la posición del FAB
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -71,58 +71,99 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+// La anotación @OptIn es necesaria porque algunos componentes de Material3 (como TopAppBar)
+// aún se consideran experimentales en la API y podrían cambiar en el futuro.
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CalculadoraFinalApp() {
-    // --- 1. ESTADOS GLOBALES (Elevados) ---
-    // Datos de la calculadora
+    // ========================================================================
+    // 1. ELEVACIÓN DE ESTADO (STATE HOISTING)
+    // ========================================================================
+    // Definimos las variables aquí (en el padre) para poder compartirlas entre hijos.
+    // Usamos 'rememberSaveable' en lugar de 'remember' para que los datos NO se pierdan
+    // al girar la pantalla (cambios de configuración).
+
+    // Datos de la lógica de negocio
     var numero1 by rememberSaveable { mutableStateOf("") }
     var numero2 by rememberSaveable { mutableStateOf("") }
     var resultado by rememberSaveable { mutableStateOf("0.0") }
 
-    // Estados de Aspecto (Configuración visual)
-    // Opción seleccionada: 0 = Ambas, 1 = Solo Top, 2 = Solo Bottom
-    var opcionBarras by rememberSaveable { mutableIntStateOf(0) }
-    // Color de fondo del Scaffold
+    // Estados de UI (Configuración visual)
+    var opcionBarras by rememberSaveable { mutableIntStateOf(0) } // 0: Ambas, 1: Top, 2: Bottom
     var esFondoOscuro by rememberSaveable { mutableStateOf(false) }
+
+    // Lógica derivada: El color depende del booleano 'esFondoOscuro'
     val colorFondo = if (esFondoOscuro) Color.LightGray else Color.White
 
-    // Navegación
+    // Estados de navegación y control
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    // 'scope' es necesario para lanzar acciones asíncronas como abrir el Drawer o mostrar Snackbar
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Esta variable actúa como nuestro "Router" o gestor de navegación simple
     var pantallaActual by rememberSaveable { mutableStateOf("Presentación") }
 
-    // --- 2. ESTRUCTURA (Drawer + Scaffold) ---
+    // ========================================================================
+    // 2. ESTRUCTURA: DRAWER -> SCAFFOLD -> CONTENIDO
+    // ========================================================================
+    // El NavigationDrawer debe envolver al Scaffold para que el menú se deslice SOBRE toda la app.
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
                 Text("Menú App", modifier = Modifier.padding(16.dp), fontSize = 24.sp, fontWeight = FontWeight.Bold)
                 HorizontalDivider()
-                // Ítems de navegación
-                NavigationDrawerItem(label = { Text("Presentación") }, selected = pantallaActual == "Presentación", onClick = { pantallaActual = "Presentación"; scope.launch { drawerState.close() } })
-                NavigationDrawerItem(label = { Text("Calculadora") }, selected = pantallaActual == "Calculadora", onClick = { pantallaActual = "Calculadora"; scope.launch { drawerState.close() } })
-                NavigationDrawerItem(label = { Text("Resultado") }, selected = pantallaActual == "Resultado", onClick = { pantallaActual = "Resultado"; scope.launch { drawerState.close() } })
-                NavigationDrawerItem(label = { Text("Aspecto") }, selected = pantallaActual == "Aspecto", onClick = { pantallaActual = "Aspecto"; scope.launch { drawerState.close() } })
+
+                // Ítems de navegación: Al hacer clic, cambiamos la variable 'pantallaActual'
+                // y cerramos el menú suavemente usando una corrutina (scope.launch).
+                NavigationDrawerItem(
+                    label = { Text("Presentación") },
+                    selected = pantallaActual == "Presentación",
+                    onClick = { pantallaActual = "Presentación"; scope.launch { drawerState.close() } }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Calculadora") },
+                    selected = pantallaActual == "Calculadora",
+                    onClick = { pantallaActual = "Calculadora"; scope.launch { drawerState.close() } }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Resultado") },
+                    selected = pantallaActual == "Resultado",
+                    onClick = { pantallaActual = "Resultado"; scope.launch { drawerState.close() } }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Aspecto") },
+                    selected = pantallaActual == "Aspecto",
+                    onClick = { pantallaActual = "Aspecto"; scope.launch { drawerState.close() } }
+                )
             }
         }
     ) {
+        // El SCAFFOLD proporciona la estructura estándar de Material Design (TopBar, BottomBar, FAB)
         Scaffold(
-            containerColor = colorFondo, // Aplicamos el cambio de color aquí
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            containerColor = colorFondo, // El color cambia dinámicamente según el estado
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) }, // Zona para mensajes emergentes
 
-            // Lógica para mostrar/ocultar TopBar según lo elegido en "Aspecto"
+            // --- TOP BAR ---
+            // Renderizado condicional: Solo se dibuja si la opción elegida lo permite
             topBar = {
                 if (opcionBarras == 0 || opcionBarras == 1) {
                     TopAppBar(
-                        title = { Text(pantallaActual) },
-                        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = Color.White, navigationIconContentColor = Color.White, actionIconContentColor = Color.White),
+                        title = { Text(pantallaActual) }, // El título cambia según la pantalla
+                        colors = TopAppBarDefaults.topAppBarColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            titleContentColor = Color.White,
+                            navigationIconContentColor = Color.White,
+                            actionIconContentColor = Color.White
+                        ),
+                        // Botón Hamburguesa para abrir el menú lateral
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(Icons.Default.Menu, contentDescription = "Menú")
                             }
                         },
+                        // Icono de información a la derecha
                         actions = {
                             IconButton(onClick = { scope.launch { snackbarHostState.showSnackbar("Estás en $pantallaActual") } }) {
                                 Icon(Icons.Default.Info, contentDescription = "Info")
@@ -132,7 +173,7 @@ fun CalculadoraFinalApp() {
                 }
             },
 
-            // Lógica para mostrar/ocultar BottomBar
+            // --- BOTTOM BAR ---
             bottomBar = {
                 if (opcionBarras == 0 || opcionBarras == 2) {
                     BottomAppBar(containerColor = MaterialTheme.colorScheme.primaryContainer) {
@@ -141,29 +182,39 @@ fun CalculadoraFinalApp() {
                 }
             },
 
-            // FAB solo en calculadora
+            // --- FLOATING ACTION BUTTON (FAB) ---
             floatingActionButton = {
+                // Solo mostramos el botón flotante si estamos en la pantalla Calculadora
                 if (pantallaActual == "Calculadora") {
-                    FloatingActionButton(onClick = { /* Acción extra */ }) { Icon(Icons.Default.Add, "Sumar") }
+                    FloatingActionButton(onClick = { /* Acción futura */ }) { Icon(Icons.Default.Add, "Sumar") }
                 }
             },
+            // Posicionamiento explícito en el centro de la pantalla
             floatingActionButtonPosition = FabPosition.Center
 
         ) { paddingValues ->
 
-            // --- 3. GESTIÓN DE PANTALLAS ---
+            // ========================================================================
+            // 3. GESTOR DE PANTALLAS (CONTENIDO PRINCIPAL)
+            // ========================================================================
+            // Usamos un Box con paddingValues para respetar el espacio ocupado por la TopBar y BottomBar
             Box(modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp)) {
+
+                // Switch para decidir qué Composable pintar en el centro de la pantalla
                 when (pantallaActual) {
                     "Calculadora" -> PantallaCalculadora(
+                        // Pasamos los valores (Lectura)
                         n1 = numero1,
                         n2 = numero2,
                         res = resultado,
+                        // Pasamos las funciones para modificar los valores (Escritura / Eventos)
+                        // Esto se llama "Unidirectional Data Flow"
                         onN1Change = { numero1 = it },
                         onN2Change = { numero2 = it },
                         onResultadoChange = { resultado = it }
                     )
 
-                    "Resultado" -> PantallaResultado(resultado)
+                    "Resultado" -> PantallaResultado(resultado) // Solo lectura
 
                     "Aspecto" -> PantallaAspecto(
                         opcionSeleccionada = opcionBarras,
@@ -172,30 +223,30 @@ fun CalculadoraFinalApp() {
                         onFondoChange = { esFondoOscuro = !esFondoOscuro }
                     )
 
-                    "Presentación" -> PantallaPresentacion()
+                    "Presentación" -> PantallaPresentacion() // Pantalla estática
                 }
             }
         }
     }
 }
 
-// --- 4. COMPONENTES DE PANTALLA (MODULARIDAD) ---
+// ========================================================================
+// 4. COMPONENTES MODULARES (PANTALLAS)
+// ========================================================================
 
 @Composable
 fun PantallaCalculadora(
     n1: String, n2: String, res: String,
-    onN1Change: (String) -> Unit,
+    onN1Change: (String) -> Unit, // Callback para avisar al padre que el texto cambió
     onN2Change: (String) -> Unit,
     onResultadoChange: (String) -> Unit
 ) {
-    // FUNCIÓN AUXILIAR: Redondea bonito
+    // Función auxiliar local para lógica de presentación (formateo de decimales)
     fun formatear(numero: Double): String {
-        // Si el número es entero (ej: 8.0), lo convertimos a Int para quitar el .0
         return if (numero % 1.0 == 0.0) {
-            numero.toInt().toString()
+            numero.toInt().toString() // Si es entero (8.0), devuelve "8"
         } else {
-            // Si tiene decimales, mostramos solo 2
-            "%.2f".format(numero)
+            "%.2f".format(numero) // Si es decimal, recorta a 2 decimales
         }
     }
 
@@ -203,14 +254,17 @@ fun PantallaCalculadora(
         Text("Calculadora", fontSize = 24.sp, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Inputs
+        // Campo de texto 1
         OutlinedTextField(
-            value = n1, onValueChange = onN1Change,
+            value = n1,
+            onValueChange = onN1Change, // Ejecuta la lambda que recibimos del padre
             label = { Text("Número 1") },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Campo de texto 2
         OutlinedTextField(
             value = n2, onValueChange = onN2Change,
             label = { Text("Número 2") },
@@ -220,12 +274,13 @@ fun PantallaCalculadora(
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // FILA 1
+        // Fila de botones 1 (Sumar/Restar)
+        // Usamos weight(1f) para que ambos botones ocupen exactamente el 50% del ancho
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = {
                     val r = (n1.toDoubleOrNull() ?: 0.0) + (n2.toDoubleOrNull() ?: 0.0)
-                    onResultadoChange(formatear(r)) // Usamos la función formatear
+                    onResultadoChange(formatear(r))
                 },
                 modifier = Modifier.weight(1f)
             ) { Text("SUMAR") }
@@ -241,7 +296,7 @@ fun PantallaCalculadora(
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // FILA 2
+        // Fila de botones 2 (Multi/Div)
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Button(
                 onClick = {
@@ -272,7 +327,7 @@ fun PantallaCalculadora(
 
 @Composable
 fun PantallaResultado(resultado: String) {
-    // Paso 9: Pantalla que solo muestra el último resultado
+    // Esta pantalla es "Stateless" (sin estado propio), solo muestra lo que recibe
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -308,17 +363,15 @@ fun PantallaAspecto(
 
         Text("Visibilidad de Barras:", fontWeight = FontWeight.Bold)
 
-        // Radio Button 1
+        // Radio Buttons: Al hacer clic, invocan el callback 'onOpcionChange' que actualiza el estado en el padre
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = opcionSeleccionada == 0, onClick = { onOpcionChange(0) })
             Text("Ver Ambas (Top & Bottom)")
         }
-        // Radio Button 2
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = opcionSeleccionada == 1, onClick = { onOpcionChange(1) })
             Text("Solo Top Bar")
         }
-        // Radio Button 3
         Row(verticalAlignment = Alignment.CenterVertically) {
             RadioButton(selected = opcionSeleccionada == 2, onClick = { onOpcionChange(2) })
             Text("Solo Bottom Bar")
@@ -334,10 +387,9 @@ fun PantallaAspecto(
         Button(
             onClick = onFondoChange,
             colors = ButtonDefaults.buttonColors(
-                // 1. Color del botón (Caja)
+                // Cambiamos el color del botón según el estado
                 containerColor = if (esFondoOscuro) Color.White else Color.Gray,
-
-                // 2. Color del texto/contenido
+                // IMPORTANTE: Cambiamos el color del texto para asegurar contraste (Accesibilidad)
                 contentColor = if (esFondoOscuro) Color.Black else Color.White
             )
         ) {
@@ -348,6 +400,7 @@ fun PantallaAspecto(
 
 @Composable
 fun PantallaPresentacion() {
+    // Pantalla estática de bienvenida con diseño centrado
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -355,7 +408,6 @@ fun PantallaPresentacion() {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Tarjeta decorativa
         Card(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
@@ -364,12 +416,9 @@ fun PantallaPresentacion() {
             modifier = Modifier.fillMaxWidth().padding(16.dp)
         ) {
             Column(
-                modifier = Modifier
-                    .padding(32.dp)
-                    .fillMaxWidth(),
+                modifier = Modifier.padding(32.dp).fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Icono decorativo (puedes cambiarlo por otro)
                 Icon(
                     imageVector = Icons.Default.Info,
                     contentDescription = "Logo",
@@ -379,7 +428,6 @@ fun PantallaPresentacion() {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                // Título Grande
                 Text(
                     text = "Práctica DI0703",
                     fontSize = 28.sp,
@@ -390,7 +438,6 @@ fun PantallaPresentacion() {
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Subtítulo
                 Text(
                     text = "Desarrollo de Interfaces",
                     fontSize = 18.sp,
@@ -402,7 +449,6 @@ fun PantallaPresentacion() {
                 HorizontalDivider(thickness = 1.dp, color = Color.Gray)
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Descripción o Nombre del alumno
                 Text(
                     text = "Ejercicio de Calculadora Modular\ncon Jetpack Compose",
                     fontSize = 14.sp,
