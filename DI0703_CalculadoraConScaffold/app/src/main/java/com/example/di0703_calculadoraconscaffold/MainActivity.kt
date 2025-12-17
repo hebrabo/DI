@@ -6,6 +6,8 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -13,9 +15,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,9 +38,17 @@ fun CalculadoraScaffoldApp() {
     var numero2 by remember { mutableStateOf("") }
     var resultado by remember { mutableStateOf("0.0") }
 
-    // 1. SCAFFOLD: La estructura base
+    // --- CONFIGURACIÓN PARA EL SNACKBAR (Paso 4) ---
+    // 1. Estado para controlar el Snackbar
+    val snackbarHostState = remember { SnackbarHostState() }
+    // 2. Scope para lanzar la acción de mostrarlo (es una acción asíncrona)
+    val scope = rememberCoroutineScope()
+
     Scaffold(
-        // 2. TOP APP BAR: Barra superior
+        // --- PASO 4 (Host): Le decimos al Scaffold dónde pintar el mensaje ---
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+
+        // --- TOP APP BAR (Con acción de Snackbar) ---
         topBar = {
             TopAppBar(
                 title = { Text("Calculadora Avanzada") },
@@ -46,21 +58,50 @@ fun CalculadoraScaffoldApp() {
                     actionIconContentColor = Color.White
                 ),
                 actions = {
-                    // Icono de acción a la derecha (Punto 2)
-                    IconButton(onClick = { /* Acción futura */ }) {
-                        Icon(
-                            imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Opciones"
-                        )
+                    // Acción: Al pulsar el icono de información, sale el Snackbar
+                    IconButton(onClick = {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Has pulsado Información")
+                        }
+                    }) {
+                        Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
                     }
                 }
             )
-        }
-        // Aquí irán: bottomBar, floatingActionButton, etc. en los siguientes pasos
+        },
+
+        // --- PASO 3: BOTTOM APP BAR ---
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ) {
+                // Texto decorativo en la barra inferior
+                Text(
+                    text = "Desarrollo de Interfaces",
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center
+                )
+            }
+        },
+
+        // --- PASO 5: FLOATING ACTION BUTTON (FAB) ---
+        floatingActionButton = {
+            FloatingActionButton(
+                onClick = {
+                    // Acción del FAB: Calcular (Simulado) o Resetear
+                    scope.launch { snackbarHostState.showSnackbar("Acción Principal: Calcular") }
+                },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Calcular", tint = Color.White)
+            }
+        },
+        // Posicionamos el FAB en el CENTRO para que quede sobre la BottomBar
+        floatingActionButtonPosition = FabPosition.Center
     ) { paddingValues ->
 
-        // CONTENIDO DE LA PANTALLA
-        // Es OBLIGATORIO usar 'paddingValues' para que la barra no tape el contenido
+        // CONTENIDO PRINCIPAL
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -68,7 +109,6 @@ fun CalculadoraScaffoldApp() {
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // -- Aquí pegamos nuestra calculadora básica --
             TextField(
                 value = numero1,
                 onValueChange = { numero1 = it },
@@ -86,11 +126,6 @@ fun CalculadoraScaffoldApp() {
             )
 
             Spacer(modifier = Modifier.height(20.dp))
-
-            // Botones simples para probar
-            Button(onClick = { /* Lógica pendiente */ }) { Text("Operar (Ejemplo)") }
-
-            Spacer(modifier = Modifier.height(20.dp))
             Text(text = "Resultado: $resultado", fontSize = 24.sp)
         }
     }
@@ -98,6 +133,6 @@ fun CalculadoraScaffoldApp() {
 
 @Preview(showBackground = true)
 @Composable
-fun GreetingPreview() {
+fun CalculadoraPreview() {
     CalculadoraScaffoldApp()
 }
