@@ -8,7 +8,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -20,113 +20,151 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
+import androidx.compose.runtime.saveable.rememberSaveable
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            CalculadoraScaffoldApp()
+            CalculadoraDrawerApp()
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CalculadoraScaffoldApp() {
-    // Estados de la calculadora
-    var numero1 by remember { mutableStateOf("") }
-    var numero2 by remember { mutableStateOf("") }
-    var resultado by remember { mutableStateOf("0.0") }
+fun CalculadoraDrawerApp() {
+    // ESTADOS DE LA CALCULADORA
+    var numero1 by rememberSaveable { mutableStateOf("") }
+    var numero2 by rememberSaveable { mutableStateOf("") }
+    var resultado by rememberSaveable { mutableStateOf("0.0") }
 
-    // --- CONFIGURACIÓN PARA EL SNACKBAR (Paso 4) ---
-    // 1. Estado para controlar el Snackbar
-    val snackbarHostState = remember { SnackbarHostState() }
-    // 2. Scope para lanzar la acción de mostrarlo (es una acción asíncrona)
+    // ESTADOS DE NAVEGACIÓN Y DRAWER
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
-    Scaffold(
-        // --- PASO 4 (Host): Le decimos al Scaffold dónde pintar el mensaje ---
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    // Variable para saber qué pantalla mostrar
+    // Opciones: "Presentación", "Calculadora", "Resultado", "Aspecto"
+    var pantallaActual by rememberSaveable { mutableStateOf("Calculadora") }
 
-        // --- TOP APP BAR (Con acción de Snackbar) ---
-        topBar = {
-            TopAppBar(
-                title = { Text("Calculadora Avanzada") },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = Color.White,
-                    actionIconContentColor = Color.White
-                ),
-                actions = {
-                    // Acción: Al pulsar el icono de información, sale el Snackbar
-                    IconButton(onClick = {
-                        scope.launch {
-                            snackbarHostState.showSnackbar("Has pulsado Información")
-                        }
-                    }) {
-                        Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
+    // 1. EL DRAWER ENVUELVE AL SCAFFOLD
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet {
+                Text("Menú Principal", modifier = Modifier.padding(16.dp), fontSize = 20.sp)
+                HorizontalDivider()
+
+                // Ítems del menú (Punto 7 del ejercicio)
+                NavigationDrawerItem(
+                    label = { Text("Presentación") },
+                    selected = pantallaActual == "Presentación",
+                    onClick = {
+                        pantallaActual = "Presentación"
+                        scope.launch { drawerState.close() }
                     }
-                }
-            )
-        },
-
-        // --- PASO 3: BOTTOM APP BAR ---
-        bottomBar = {
-            BottomAppBar(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
-            ) {
-                // Texto decorativo en la barra inferior
-                Text(
-                    text = "Desarrollo de Interfaces",
-                    modifier = Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center
+                )
+                NavigationDrawerItem(
+                    label = { Text("Calculadora") },
+                    selected = pantallaActual == "Calculadora",
+                    onClick = {
+                        pantallaActual = "Calculadora"
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Resultado") },
+                    selected = pantallaActual == "Resultado",
+                    onClick = {
+                        pantallaActual = "Resultado"
+                        scope.launch { drawerState.close() }
+                    }
+                )
+                NavigationDrawerItem(
+                    label = { Text("Aspecto") },
+                    selected = pantallaActual == "Aspecto",
+                    onClick = {
+                        pantallaActual = "Aspecto"
+                        scope.launch { drawerState.close() }
+                    }
                 )
             }
-        },
+        }
+    ) {
+        // 2. EL SCAFFOLD VA DENTRO DEL DRAWER
+        Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            topBar = {
+                TopAppBar(
+                    title = { Text(pantallaActual) }, // El título cambia según la pantalla
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = Color.White,
+                        navigationIconContentColor = Color.White,
+                        actionIconContentColor = Color.White
+                    ),
+                    // NUEVO: Icono de Hamburguesa para abrir el menú
+                    navigationIcon = {
+                        IconButton(onClick = { scope.launch { drawerState.open() } }) {
+                            Icon(imageVector = Icons.Default.Menu, contentDescription = "Menú")
+                        }
+                    },
+                    actions = {
+                        IconButton(onClick = { scope.launch { snackbarHostState.showSnackbar("Info") } }) {
+                            Icon(imageVector = Icons.Default.Info, contentDescription = "Info")
+                        }
+                    }
+                )
+            },
+            bottomBar = {
+                BottomAppBar(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ) {
+                    Text("DI0703 - Android Compose", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
+                }
+            },
+            floatingActionButton = {
+                // Solo mostramos el botón de calcular si estamos en la pantalla Calculadora
+                if (pantallaActual == "Calculadora") {
+                    FloatingActionButton(
+                        onClick = { scope.launch { snackbarHostState.showSnackbar("Calculando...") } },
+                        containerColor = MaterialTheme.colorScheme.primary
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = "Calcular", tint = Color.White)
+                    }
+                }
+            },
+            floatingActionButtonPosition = FabPosition.Center
+        ) { paddingValues ->
 
-        // --- PASO 5: FLOATING ACTION BUTTON (FAB) ---
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    // Acción del FAB: Calcular (Simulado) o Resetear
-                    scope.launch { snackbarHostState.showSnackbar("Acción Principal: Calcular") }
-                },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Calcular", tint = Color.White)
+            // 3. GESTIÓN DE PANTALLAS (CAMBIO DE CONTENIDO)
+            Box(modifier = Modifier.padding(paddingValues).fillMaxSize().padding(16.dp)) {
+                when (pantallaActual) {
+                    "Calculadora" -> {
+                        // El código de nuestra calculadora
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            TextField(
+                                value = numero1, onValueChange = { numero1 = it },
+                                label = { Text("Número 1") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(10.dp))
+                            TextField(
+                                value = numero2, onValueChange = { numero2 = it },
+                                label = { Text("Número 2") }, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                            Spacer(modifier = Modifier.height(20.dp))
+                            Text("Resultado actual: $resultado", fontSize = 20.sp)
+                        }
+                    }
+                    "Presentación" -> Text("Pantalla de Presentación (Pendiente)", fontSize = 24.sp)
+                    "Resultado" -> Text("Pantalla de Resultado Global (Pendiente)", fontSize = 24.sp)
+                    "Aspecto" -> Text("Configuración de Aspecto (Pendiente)", fontSize = 24.sp)
+                }
             }
-        },
-        // Posicionamos el FAB en el CENTRO para que quede sobre la BottomBar
-        floatingActionButtonPosition = FabPosition.Center
-    ) { paddingValues ->
-
-        // CONTENIDO PRINCIPAL
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TextField(
-                value = numero1,
-                onValueChange = { numero1 = it },
-                label = { Text("Número 1") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(modifier = Modifier.height(10.dp))
-            TextField(
-                value = numero2,
-                onValueChange = { numero2 = it },
-                label = { Text("Número 2") },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(20.dp))
-            Text(text = "Resultado: $resultado", fontSize = 24.sp)
         }
     }
 }
@@ -134,5 +172,5 @@ fun CalculadoraScaffoldApp() {
 @Preview(showBackground = true)
 @Composable
 fun CalculadoraPreview() {
-    CalculadoraScaffoldApp()
+    CalculadoraDrawerApp()
 }
