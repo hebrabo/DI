@@ -14,6 +14,7 @@ sealed class Rutas(val ruta: String) {
     object Home : Rutas("home")
     object Ajustes : Rutas("ajustes")
     object Diccionario : Rutas("diccionario") // Extra 1
+    object Juego : Rutas("juego")
 }
 
 @Composable
@@ -58,7 +59,8 @@ fun AppNavigation(
                 viewModel = palabraViewModel,
                 onNavigateToSettings = { navController.navigate(Rutas.Ajustes.ruta) },
                 // CORRECCIÓN: Aquí pasamos la función que faltaba
-                onNavigateToDictionary = { navController.navigate(Rutas.Diccionario.ruta) }
+                onNavigateToDictionary = { navController.navigate(Rutas.Diccionario.ruta) },
+                onNavigateToGame = { navController.navigate(Rutas.Juego.ruta) }
             )
         }
 
@@ -75,6 +77,14 @@ fun AppNavigation(
         // --- PANTALLA DEL DICCIONARIO (Extra 1) ---
         composable(Rutas.Diccionario.ruta) {
             DiccionarioScreen(
+                viewModel = palabraViewModel,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // --- PANTALLA DEL JUEGO (Extra 3) ---
+        composable(Rutas.Juego.ruta) {
+            JuegoScreen(
                 viewModel = palabraViewModel,
                 onBackClick = { navController.popBackStack() }
             )

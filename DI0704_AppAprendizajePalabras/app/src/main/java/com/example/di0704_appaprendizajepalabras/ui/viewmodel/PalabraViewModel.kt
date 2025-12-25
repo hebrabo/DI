@@ -10,18 +10,24 @@ import androidx.lifecycle.ViewModel
 import com.example.di0704_appaprendizajepalabras.data.model.Palabra
 import com.example.di0704_appaprendizajepalabras.data.repository.PalabraRepository
 
+/**
+ * Clase para representar un reto del mini juego (Extra 3)
+ */
+data class QuizState(
+    val palabra: Palabra,
+    val opciones: List<String>,
+    val respuestaCorrecta: String
+)
+
 class PalabraViewModel : ViewModel() {
     private val repository = PalabraRepository()
+    private val idsMostradas = mutableSetOf<Int>()
 
     // 1. Estado del idioma
     var idiomaActual by mutableStateOf("Español")
         private set
 
-    // --- NUEVO: Registro de IDs mostrados para evitar repeticiones ---
-    private val idsMostradas = mutableSetOf<Int>()
-
     // 2. Estado de la palabra actual
-    // Inicializamos con el saco vacío para la primera palabra
     private val _palabraActual = mutableStateOf(obtenerNuevaPalabraSegura("Español"))
     val palabraActual: State<Palabra> = _palabraActual
 
@@ -32,63 +38,86 @@ class PalabraViewModel : ViewModel() {
     private val _palabrasAprendidas = mutableStateListOf<Palabra>()
     val palabrasAprendidas: List<Palabra> = _palabrasAprendidas
 
+    // --- EXTRA 3: ESTADO DEL MINI JUEGO ---
+    private val _quizActual = mutableStateOf<QuizState?>(null)
+    val quizActual: State<QuizState?> = _quizActual
+
+    var aciertosJuego by mutableIntStateOf(0)
+        private set
+
     fun cambiarIdioma(nuevoIdioma: String) {
         if (idiomaActual != nuevoIdioma) {
             idiomaActual = nuevoIdioma
-            // No reseteamos el saco aquí para que, si vuelve al idioma anterior,
-            // recuerde qué palabras ya vio en esa sesión.
             siguientePalabra()
         }
     }
 
     fun siguientePalabra() {
         val palabraAnterior = _palabraActual.value
-
-        // Guardamos en el historial (Extra)
         if (palabraAnterior.id != 0 && !_palabrasAprendidas.any { it.id == palabraAnterior.id }) {
             _palabrasAprendidas.add(palabraAnterior)
         }
-
-        // Incrementamos estadística
         palabrasVistas++
-
-        // Obtenemos la siguiente palabra con la lógica de filtrado
         _palabraActual.value = obtenerNuevaPalabraSegura(idiomaActual)
+    }
+
+    /**
+     * Genera un nuevo reto para el mini juego (Extra 3)
+     */
+    fun generarNuevoReto() {
+        val todasLasPalabras = repository.obtenerPalabrasPorIdioma(idiomaActual)
+
+        // Necesitamos al menos 3 palabras para que el juego tenga sentido
+        if (todasLasPalabras.size >= 3) {
+            val palabraCorrecta = todasLasPalabras.random()
+
+            // Elegimos 2 distractores (definiciones incorrectas)
+            val distractores = todasLasPalabras
+                .filter { it.id != palabraCorrecta.id }
+                .shuffled()
+                .take(2)
+                .map { it.definicion }
+
+            // Creamos la lista de opciones y las mezclamos
+            val opciones = (distractores + palabraCorrecta.definicion).shuffled()
+
+            _quizActual.value = QuizState(
+                palabra = palabraCorrecta,
+                opciones = opciones,
+                respuestaCorrecta = palabraCorrecta.definicion
+            )
+        }
+    }
+
+    fun registrarAcierto() {
+        aciertosJuego++
     }
 
     fun borrarProgreso() {
         idiomaActual = "Español"
         palabrasVistas = 0
+        aciertosJuego = 0
         _palabrasAprendidas.clear()
-        idsMostradas.clear() // Vaciamos el saco de palabras vistas
+        idsMostradas.clear()
         _palabraActual.value = obtenerNuevaPalabraSegura("Español")
+        _quizActual.value = null
     }
 
-    /**
-     * Lógica Inteligente: Filtra las palabras para no repetir.
-     */
     private fun obtenerNuevaPalabraSegura(idioma: String): Palabra {
         val todasLasPalabras = repository.obtenerPalabrasPorIdioma(idioma)
-
         if (todasLasPalabras.isEmpty()) {
-            return Palabra(0, "Error", "No hay palabras en el repositorio.", idioma, null)
+            return Palabra(0, "Error", "No hay palabras", idioma, null)
         }
 
-        // 1. Buscamos palabras que NO estén en el saco de 'idsMostradas'
         val palabrasNoVistas = todasLasPalabras.filter { it.id !in idsMostradas }
 
         return if (palabrasNoVistas.isNotEmpty()) {
-            // 2. Si quedan palabras por ver, elegimos una al azar
             val nuevaPalabra = palabrasNoVistas.random()
-            idsMostradas.add(nuevaPalabra.id) // La metemos en el saco
+            idsMostradas.add(nuevaPalabra.id)
             nuevaPalabra
         } else {
-            // 3. Si ya se han mostrado todas (saco lleno), reiniciamos el ciclo
-            // Limpiamos del saco solo las palabras correspondientes a este idioma
             val idsIdiomaActual = todasLasPalabras.map { it.id }.toSet()
             idsMostradas.removeAll(idsIdiomaActual)
-
-            // Elegimos una al azar del total y empezamos de nuevo
             val reinicioPalabra = todasLasPalabras.random()
             idsMostradas.add(reinicioPalabra.id)
             reinicioPalabra

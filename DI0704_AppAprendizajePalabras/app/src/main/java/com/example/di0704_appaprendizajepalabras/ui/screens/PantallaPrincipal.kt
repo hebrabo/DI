@@ -29,13 +29,16 @@ import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 import kotlinx.coroutines.launch
 import coil.compose.AsyncImage
 import kotlin.math.abs
+import androidx.compose.material.icons.filled.Gamepad // <-- AÑADE ESTO
+import androidx.compose.material.icons.filled.Menu
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaPrincipal(
     viewModel: PalabraViewModel,
     onNavigateToSettings: () -> Unit,
-    onNavigateToDictionary: () -> Unit // Nueva navegación para el Extra 1
+    onNavigateToDictionary: () -> Unit,
+    onNavigateToGame: () -> Unit // <-- AÑADE ESTE PARÁMETRO
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -114,6 +117,18 @@ fun PantallaPrincipal(
                     onClick = {
                         scope.launch { drawerState.close() }
                         onNavigateToDictionary()
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+                // --- AQUÍ VA EL NUEVO CÓDIGO DEL JUEGO ---
+                NavigationDrawerItem(
+                    label = { Text("Mini Juego") },
+                    selected = false,
+                    icon = { Icon(Icons.Default.Gamepad, contentDescription = null) },
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToGame() // Esto activa la navegación que definimos en AppNavigation
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
