@@ -16,11 +16,13 @@ import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
-    // Generar el primer reto al entrar
+    // Generar el primer reto al entrar en la pantalla
     LaunchedEffect(Unit) { viewModel.generarNuevoReto() }
 
     val quiz = viewModel.quizActual.value
     var mensajeResultado by remember { mutableStateOf("") }
+    // Estado para bloquear botones tras responder una vez
+    var respondido by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -35,47 +37,101 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
         }
     ) { padding ->
         Column(
-            modifier = Modifier.fillMaxSize().padding(padding).padding(20.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
             quiz?.let { q ->
-                Text("¿Cuál es la definición de:", style = MaterialTheme.typography.titleMedium)
                 Text(
-                    text = q.palabra.termino,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    text = "¿Cuál es la definición de:",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.outline
                 )
 
-                Spacer(modifier = Modifier.height(30.dp))
+                Text(
+                    text = q.palabra.termino,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center
+                )
 
+                Spacer(modifier = Modifier.height(32.dp))
+
+                // Lista de opciones
                 q.opciones.forEach { opcion ->
+                    val esCorrecta = opcion == q.respuestaCorrecta
+
                     Button(
                         onClick = {
-                            mensajeResultado = if (opcion == q.respuestaCorrecta) "¡Correcto! 🎉" else "Casi... era otra ❌"
+                            if (!respondido) { // Solo procesamos si no ha respondido aún
+                                respondido = true
+                                if (esCorrecta) {
+                                    mensajeResultado = "¡Correcto! 🎉"
+                                    viewModel.registrarAcierto() // ACTUALIZA EXTRA 4
+                                } else {
+                                    mensajeResultado = "Casi... era otra ❌"
+                                }
+                            }
                         },
-                        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp),
-                        shape = MaterialTheme.shapes.medium,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 6.dp),
+                        enabled = !respondido, // Desactiva botones tras la respuesta
+                        shape = MaterialTheme.shapes.large,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onSecondaryContainer
+                            containerColor = if (respondido && esCorrecta)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.secondaryContainer,
+                            contentColor = if (respondido && esCorrecta)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSecondaryContainer
                         )
                     ) {
-                        Text(opcion, textAlign = TextAlign.Center)
+                        Text(
+                            text = opcion,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(vertical = 8.dp)
+                        )
                     }
                 }
 
-                if (mensajeResultado.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(20.dp))
-                    Text(mensajeResultado, style = MaterialTheme.typography.headlineSmall)
-                    Button(onClick = {
-                        mensajeResultado = ""
-                        viewModel.generarNuevoReto()
-                    }) {
+                // Sección de feedback y siguiente reto
+                if (respondido) {
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = mensajeResultado,
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold,
+                        color = if (mensajeResultado.contains("Correcto"))
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.error
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Button(
+                        onClick = {
+                            mensajeResultado = ""
+                            respondido = false
+                            viewModel.generarNuevoReto()
+                        },
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 4.dp)
+                    ) {
                         Text("Siguiente reto")
                     }
                 }
+            } ?: run {
+                // Estado de carga si no hay palabras suficientes
+                CircularProgressIndicator()
+                Text("Preparando el desafío...", modifier = Modifier.padding(top = 16.dp))
             }
         }
     }

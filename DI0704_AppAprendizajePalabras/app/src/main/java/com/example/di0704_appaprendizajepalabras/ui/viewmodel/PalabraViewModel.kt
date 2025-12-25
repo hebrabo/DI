@@ -9,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import com.example.di0704_appaprendizajepalabras.data.model.Palabra
 import com.example.di0704_appaprendizajepalabras.data.repository.PalabraRepository
+import java.time.LocalDate
+import java.time.temporal.ChronoUnit
 
 /**
  * Clase para representar un reto del mini juego (Extra 3)
@@ -31,7 +33,7 @@ class PalabraViewModel : ViewModel() {
     private val _palabraActual = mutableStateOf(obtenerNuevaPalabraSegura("Español"))
     val palabraActual: State<Palabra> = _palabraActual
 
-    // --- EXTRAS: ESTADÍSTICAS Y APRENDIZAJE ---
+    // --- EXTRA 2: ESTADÍSTICAS BÁSICAS ---
     var palabrasVistas by mutableIntStateOf(0)
         private set
 
@@ -42,8 +44,38 @@ class PalabraViewModel : ViewModel() {
     private val _quizActual = mutableStateOf<QuizState?>(null)
     val quizActual: State<QuizState?> = _quizActual
 
-    var aciertosJuego by mutableIntStateOf(0)
+    // --- EXTRA 4: ESTADÍSTICAS AVANZADAS ---
+    var juegosSuperados by mutableIntStateOf(0)
         private set
+
+    var rachaDias by mutableIntStateOf(1)
+        private set
+
+    var totalSesiones by mutableIntStateOf(1) // Empezamos en 1 al abrir la app
+        private set
+
+    // Simulamos una fecha de última conexión (en una app real esto vendría de una base de datos)
+    private var fechaUltimaConexion: LocalDate = LocalDate.now().minusDays(1)
+
+    init {
+        // Al iniciar el ViewModel, calculamos la racha
+        actualizarRacha()
+    }
+
+    private fun actualizarRacha() {
+        val hoy = LocalDate.now()
+        // Calculamos la diferencia de días entre hoy y la última vez que se conectó
+        val diferencia = ChronoUnit.DAYS.between(fechaUltimaConexion, hoy)
+
+        if (diferencia == 1L) {
+            // Se conectó ayer, la racha aumenta
+            rachaDias++
+        } else if (diferencia > 1L) {
+            // Pasó más de un día, la racha se rompe y vuelve a 1
+            rachaDias = 1
+        }
+        // Si diferencia es 0, significa que ya se conectó hoy, no tocamos la racha
+    }
 
     fun cambiarIdioma(nuevoIdioma: String) {
         if (idiomaActual != nuevoIdioma) {
@@ -67,18 +99,14 @@ class PalabraViewModel : ViewModel() {
     fun generarNuevoReto() {
         val todasLasPalabras = repository.obtenerPalabrasPorIdioma(idiomaActual)
 
-        // Necesitamos al menos 3 palabras para que el juego tenga sentido
         if (todasLasPalabras.size >= 3) {
             val palabraCorrecta = todasLasPalabras.random()
-
-            // Elegimos 2 distractores (definiciones incorrectas)
             val distractores = todasLasPalabras
                 .filter { it.id != palabraCorrecta.id }
                 .shuffled()
                 .take(2)
                 .map { it.definicion }
 
-            // Creamos la lista de opciones y las mezclamos
             val opciones = (distractores + palabraCorrecta.definicion).shuffled()
 
             _quizActual.value = QuizState(
@@ -89,14 +117,19 @@ class PalabraViewModel : ViewModel() {
         }
     }
 
+    /**
+     * Registra un acierto en el juego (Extra 4: Juegos Superados)
+     */
     fun registrarAcierto() {
-        aciertosJuego++
+        juegosSuperados++
     }
 
     fun borrarProgreso() {
         idiomaActual = "Español"
         palabrasVistas = 0
-        aciertosJuego = 0
+        juegosSuperados = 0
+        rachaDias = 1
+        totalSesiones = 1
         _palabrasAprendidas.clear()
         idsMostradas.clear()
         _palabraActual.value = obtenerNuevaPalabraSegura("Español")
