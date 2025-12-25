@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Button
@@ -34,6 +35,7 @@ import androidx.compose.ui.unit.sp
 import com.example.di0704_appaprendizajepalabras.data.model.Palabra
 import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 import kotlinx.coroutines.launch
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -99,7 +101,6 @@ fun PantallaPrincipal(
 
 @Composable
 fun ContenidoPalabra(palabra: Palabra, onNextClick: () -> Unit) {
-    // Esta es la función que "dibuja" y la que podemos previsualizar
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -109,13 +110,22 @@ fun ContenidoPalabra(palabra: Palabra, onNextClick: () -> Unit) {
     ) {
         Text(text = "📘 Palabra del Día", fontSize = 24.sp)
 
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(20.dp))
 
-        Text(
-            text = palabra.termino,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
-        )
+        // MOSTRAR IMAGEN SI EXISTE
+        palabra.imagenUrl?.let { url ->
+            AsyncImage(
+                model = url,
+                contentDescription = "Imagen de ${palabra.termino}",
+                modifier = Modifier
+                    .size(200.dp) // Tamaño de la foto
+                    .padding(8.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(20.dp))
+
+        Text(text = palabra.termino, fontSize = 32.sp, fontWeight = FontWeight.Bold)
 
         Spacer(modifier = Modifier.height(16.dp))
 
