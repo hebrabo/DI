@@ -7,7 +7,10 @@ import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -31,7 +34,8 @@ import kotlin.math.abs
 @Composable
 fun PantallaPrincipal(
     viewModel: PalabraViewModel,
-    onNavigateToSettings: () -> Unit
+    onNavigateToSettings: () -> Unit,
+    onNavigateToDictionary: () -> Unit // Nueva navegación para el Extra 1
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -39,6 +43,7 @@ fun PantallaPrincipal(
     val palabra = viewModel.palabraActual.value
 
     // --- EXTRA 5: LÓGICA DEL SENSOR DE AGITADO (SHAKE) ---
+
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
@@ -48,7 +53,7 @@ fun PantallaPrincipal(
             private var lastX = 0f
             private var lastY = 0f
             private var lastZ = 0f
-            private val SHAKE_THRESHOLD = 1200 // Sensibilidad (ajústalo si es muy sensible)
+            private val SHAKE_THRESHOLD = 800 // Ajustado para mejor respuesta en emulador/físico
 
             override fun onSensorChanged(event: SensorEvent) {
                 val curTime = System.currentTimeMillis()
@@ -63,7 +68,6 @@ fun PantallaPrincipal(
                     val speed = abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000
 
                     if (speed > SHAKE_THRESHOLD) {
-                        // ¡Agitado detectado! Llamamos a la lógica del ViewModel
                         viewModel.siguientePalabra()
                     }
                     lastX = x; lastY = y; lastZ = z
@@ -75,10 +79,11 @@ fun PantallaPrincipal(
         sensorManager.registerListener(sensorListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
 
         onDispose {
-            // Importante: Libera el sensor cuando la pantalla no se use
             sensorManager.unregisterListener(sensorListener)
         }
     }
+
+    // --- ESTRUCTURA DE NAVEGACIÓN LATERAL (DRAWER) ---
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -92,15 +97,31 @@ fun PantallaPrincipal(
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+                // Item: Inicio
                 NavigationDrawerItem(
-                    label = { Text("Palabra del Día") },
+                    label = { Text("Inicio") },
+                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
                     selected = true,
                     onClick = { scope.launch { drawerState.close() } },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
+                // Item: Diccionario (Extra 1)
+                NavigationDrawerItem(
+                    label = { Text("Palabras Aprendidas") },
+                    icon = { Icon(Icons.Default.Book, contentDescription = null) },
+                    selected = false,
+                    onClick = {
+                        scope.launch { drawerState.close() }
+                        onNavigateToDictionary()
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
+                // Item: Configuración
                 NavigationDrawerItem(
                     label = { Text("Configuración") },
+                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -134,7 +155,7 @@ fun PantallaPrincipal(
                 ContenidoPalabra(
                     palabra = palabra,
                     idioma = viewModel.idiomaActual,
-                    contador = viewModel.palabrasVistas, // Pasamos la estadística
+                    contador = viewModel.palabrasVistas,
                     onNextClick = { viewModel.siguientePalabra() }
                 )
             }
@@ -151,7 +172,7 @@ fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClic
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- EXTRA 2: ESTADÍSTICAS E IDIOMA ---
+        // --- INDICADORES SUPERIORES (Estadísticas e Idioma) ---
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -161,17 +182,22 @@ fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClic
                 label = { Text("Practicando: $idioma") },
                 icon = { Icon(Icons.Default.Translate, null, modifier = Modifier.size(16.dp)) }
             )
-            // Badge con el contador de palabras vistas
+
             Badge(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
                 contentColor = MaterialTheme.colorScheme.onSecondaryContainer
             ) {
-                Text(text = "Vistas: $contador", modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp))
+                Text(
+                    text = "Vistas: $contador",
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
+        // --- TARJETA DE CONTENIDO ---
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = MaterialTheme.shapes.extraLarge,
@@ -183,8 +209,10 @@ fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClic
             ) {
                 AsyncImage(
                     model = palabra.imagenUrl,
-                    contentDescription = null,
-                    modifier = Modifier.size(200.dp),
+                    contentDescription = "Imagen de ${palabra.termino}",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(220.dp),
                     error = painterResource(android.R.drawable.ic_dialog_alert),
                     placeholder = painterResource(android.R.drawable.ic_menu_report_image),
                     contentScale = ContentScale.Fit
@@ -217,6 +245,7 @@ fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClic
 
         Spacer(modifier = Modifier.height(40.dp))
 
+        // --- BOTÓN Y AYUDA VISUAL ---
         Button(
             onClick = onNextClick,
             modifier = Modifier
@@ -228,10 +257,12 @@ fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClic
         }
 
         Spacer(modifier = Modifier.height(16.dp))
+
         Text(
-            text = "¡Agita tu dispositivo para cambiar!",
+            text = "💡 ¡Agita tu dispositivo para cambiar de palabra!",
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline
+            color = MaterialTheme.colorScheme.outline,
+            textAlign = TextAlign.Center
         )
     }
 }
@@ -249,7 +280,7 @@ fun PantallaPrincipalPreview() {
     ContenidoPalabra(
         palabra = palabraPrueba,
         idioma = "Español",
-        contador = 5,
+        contador = 12,
         onNextClick = {}
     )
 }

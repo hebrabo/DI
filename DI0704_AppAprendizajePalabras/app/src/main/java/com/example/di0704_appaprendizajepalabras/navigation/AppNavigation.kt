@@ -13,6 +13,7 @@ sealed class Rutas(val ruta: String) {
     object Registro : Rutas("registro")
     object Home : Rutas("home")
     object Ajustes : Rutas("ajustes")
+    object Diccionario : Rutas("diccionario") // Extra 1
 }
 
 @Composable
@@ -32,7 +33,6 @@ fun AppNavigation(
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigate(Rutas.Home.ruta) {
-                        // Limpiamos el historial para que no pueda volver al login con el botón atrás
                         popUpTo(Rutas.Login.ruta) { inclusive = true }
                     }
                 },
@@ -55,17 +55,27 @@ fun AppNavigation(
         // --- PANTALLA PRINCIPAL (Home) ---
         composable(Rutas.Home.ruta) {
             PantallaPrincipal(
-                viewModel = palabraViewModel, // Pasamos el ViewModel compartido
-                onNavigateToSettings = { navController.navigate(Rutas.Ajustes.ruta) }
+                viewModel = palabraViewModel,
+                onNavigateToSettings = { navController.navigate(Rutas.Ajustes.ruta) },
+                // CORRECCIÓN: Aquí pasamos la función que faltaba
+                onNavigateToDictionary = { navController.navigate(Rutas.Diccionario.ruta) }
             )
         }
 
         // --- PANTALLA DE AJUSTES ---
         composable(Rutas.Ajustes.ruta) {
             SettingsScreen(
-                viewModel = palabraViewModel, // Pasamos el MISMO ViewModel para que el idioma coincida
+                viewModel = palabraViewModel,
                 isDarkMode = isDarkMode,
                 onDarkModeChange = onDarkModeChange,
+                onBackClick = { navController.popBackStack() }
+            )
+        }
+
+        // --- PANTALLA DEL DICCIONARIO (Extra 1) ---
+        composable(Rutas.Diccionario.ruta) {
+            DiccionarioScreen(
+                viewModel = palabraViewModel,
                 onBackClick = { navController.popBackStack() }
             )
         }
