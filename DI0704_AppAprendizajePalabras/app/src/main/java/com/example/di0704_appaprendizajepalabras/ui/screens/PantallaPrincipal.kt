@@ -1,34 +1,18 @@
 package com.example.di0704_appaprendizajepalabras.ui.screens
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.ModalNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material.icons.filled.Translate
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -41,41 +25,43 @@ import coil.compose.AsyncImage
 @Composable
 fun PantallaPrincipal(
     viewModel: PalabraViewModel,
-    onNavigateToSettings: () -> Unit // Parámetro necesario para navegar
+    onNavigateToSettings: () -> Unit
 ) {
-    // 1. Estados necesarios para el Menú Lateral
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope() // Necesario para animar el menú (abrir/cerrar)
+    val scope = rememberCoroutineScope()
     val palabra = viewModel.palabraActual.value
 
-    // 2. Estructura del Menú Lateral (Drawer)
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                Text("Menú de Aprendizaje", modifier = Modifier.padding(20.dp), style = MaterialTheme.typography.titleLarge)
-                HorizontalDivider()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    "Menú de Aprendizaje",
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
+                    style = MaterialTheme.typography.titleLarge
+                )
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                // Opción: Volver a la palabra (solo cierra el menú)
                 NavigationDrawerItem(
                     label = { Text("Palabra del Día") },
                     selected = true,
-                    onClick = { scope.launch { drawerState.close() } }
+                    onClick = { scope.launch { drawerState.close() } },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // Opción: Ir a Ajustes (Cierra el menú y navega)
                 NavigationDrawerItem(
                     label = { Text("Configuración") },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
                         onNavigateToSettings()
-                    }
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
             }
         }
     ) {
-        // 3. Chasis de la pantalla (TopBar + Contenido)
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -84,14 +70,22 @@ fun PantallaPrincipal(
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
                         }
-                    }
+                    },
+                    // Añadimos un color sutil a la barra superior
+                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                    )
                 )
             }
         ) { paddingValues ->
-            Box(modifier = Modifier.padding(paddingValues)) {
-                // Llamamos a la función de dibujo que creamos en el Paso 8
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
                 ContenidoPalabra(
                     palabra = palabra,
+                    idioma = viewModel.idiomaActual, // Le pasamos el idioma para mostrar el badge
                     onNextClick = { viewModel.siguientePalabra() }
                 )
             }
@@ -100,55 +94,103 @@ fun PantallaPrincipal(
 }
 
 @Composable
-fun ContenidoPalabra(palabra: Palabra, onNextClick: () -> Unit) {
+fun ContenidoPalabra(palabra: Palabra, idioma: String, onNextClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "📘 Palabra del Día", fontSize = 24.sp)
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        // MOSTRAR IMAGEN SI EXISTE
-        palabra.imagenUrl?.let { url ->
-            AsyncImage(
-                model = url,
-                contentDescription = "Imagen de ${palabra.termino}",
-                modifier = Modifier
-                    .size(200.dp) // Tamaño de la foto
-                    .padding(8.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-
-        Text(text = palabra.termino, fontSize = 32.sp, fontWeight = FontWeight.Bold)
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = palabra.definicion,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(horizontal = 20.dp)
+        // Indicador de Idioma
+        SuggestionChip(
+            onClick = { },
+            label = { Text("Practicando: $idioma") },
+            icon = { Icon(Icons.Default.Translate, contentDescription = null, modifier = Modifier.size(16.dp)) }
         )
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        // Tarjeta Principal
+        ElevatedCard(
+            modifier = Modifier.fillMaxWidth(),
+            shape = MaterialTheme.shapes.extraLarge,
+            colors = CardDefaults.elevatedCardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            )
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Imagen con Coil
+                palabra.imagenUrl?.let { url ->
+                    AsyncImage(
+                        model = palabra.imagenUrl,
+                        contentDescription = null,
+                        modifier = Modifier.size(200.dp),
+                        // Esto mostrará un icono si la URL falla o no hay internet
+                        error = painterResource(android.R.drawable.ic_dialog_alert),
+                        placeholder = painterResource(android.R.drawable.ic_menu_report_image)
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = palabra.termino,
+                    fontSize = 36.sp,
+                    fontWeight = FontWeight.ExtraBold,
+                    color = MaterialTheme.colorScheme.primary,
+                    textAlign = TextAlign.Center
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = palabra.definicion,
+                    fontSize = 18.sp,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    lineHeight = 24.sp,
+                    modifier = Modifier.padding(horizontal = 8.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+        }
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        Button(onClick = onNextClick) {
-            Text("Practicar nuevas palabras")
+        // Botón de acción
+        Button(
+            onClick = onNextClick,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            shape = MaterialTheme.shapes.medium
+        ) {
+            Text("Siguiente palabra", fontSize = 18.sp)
         }
     }
 }
 
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun PantallaPrincipalPreview() {
-    // Creamos una palabra de prueba para verla en el diseño
-    val palabraPrueba = Palabra(1, "Xenofobia", "Rechazo u odio hacia los extranjeros.")
+    // CORRECCIÓN: Usamos argumentos nombrados para evitar errores de posición
+    val palabraPrueba = Palabra(
+        id = 1,
+        termino = "Xenofobia",
+        definicion = "Rechazo u odio hacia los extranjeros.",
+        idioma = "Español", // Este es el parámetro que faltaba/estaba mal posicionado
+        imagenUrl = "https://via.placeholder.com/200"
+    )
 
-    ContenidoPalabra(palabra = palabraPrueba, onNextClick = {})
+    // Aquí llamamos a ContenidoPalabra pasando el idioma por separado como pide la función
+    ContenidoPalabra(
+        palabra = palabraPrueba,
+        idioma = "Español",
+        onNextClick = {}
+    )
 }

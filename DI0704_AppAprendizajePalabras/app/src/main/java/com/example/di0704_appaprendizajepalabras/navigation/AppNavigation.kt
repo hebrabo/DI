@@ -7,7 +7,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.di0704_appaprendizajepalabras.ui.screens.*
 import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 
-// Definimos los nombres de las pantallas
+// 1. Definición de rutas centralizada
 sealed class Rutas(val ruta: String) {
     object Login : Rutas("login")
     object Registro : Rutas("registro")
@@ -17,9 +17,9 @@ sealed class Rutas(val ruta: String) {
 
 @Composable
 fun AppNavigation(
-    palabraViewModel: PalabraViewModel,
-    isDarkMode: Boolean,           // <--- Nuevo: recibimos el estado
-    onDarkModeChange: (Boolean) -> Unit // <--- Nuevo: recibimos la función para cambiarlo
+    palabraViewModel: PalabraViewModel, // ViewModel compartido
+    isDarkMode: Boolean,
+    onDarkModeChange: (Boolean) -> Unit
 ) {
     val navController = rememberNavController()
 
@@ -27,11 +27,12 @@ fun AppNavigation(
         navController = navController,
         startDestination = Rutas.Login.ruta
     ) {
-        // ... (Tus bloques de Login y Registro se quedan igual)
+        // --- PANTALLA DE LOGIN ---
         composable(Rutas.Login.ruta) {
             LoginScreen(
                 onLoginSuccess = {
                     navController.navigate(Rutas.Home.ruta) {
+                        // Limpiamos el historial para que no pueda volver al login con el botón atrás
                         popUpTo(Rutas.Login.ruta) { inclusive = true }
                     }
                 },
@@ -39,27 +40,33 @@ fun AppNavigation(
             )
         }
 
+        // --- PANTALLA DE REGISTRO ---
         composable(Rutas.Registro.ruta) {
             RegisterScreen(
-                onRegisterSuccess = { navController.navigate(Rutas.Home.ruta) },
+                onRegisterSuccess = {
+                    navController.navigate(Rutas.Home.ruta) {
+                        popUpTo(Rutas.Login.ruta) { inclusive = true }
+                    }
+                },
                 onBackToLogin = { navController.popBackStack() }
             )
         }
 
-        // --- MODIFICACIÓN EN HOME ---
+        // --- PANTALLA PRINCIPAL (Home) ---
         composable(Rutas.Home.ruta) {
             PantallaPrincipal(
-                viewModel = palabraViewModel,
-                onNavigateToSettings = { navController.navigate(Rutas.Ajustes.ruta) } // Para que el menú sepa ir a ajustes
+                viewModel = palabraViewModel, // Pasamos el ViewModel compartido
+                onNavigateToSettings = { navController.navigate(Rutas.Ajustes.ruta) }
             )
         }
 
-        // --- NUEVO BLOQUE DE AJUSTES ---
+        // --- PANTALLA DE AJUSTES ---
         composable(Rutas.Ajustes.ruta) {
             SettingsScreen(
+                viewModel = palabraViewModel, // Pasamos el MISMO ViewModel para que el idioma coincida
                 isDarkMode = isDarkMode,
                 onDarkModeChange = onDarkModeChange,
-                onBackClick = { navController.popBackStack() } // Esto hace que el botón de atrás funcione
+                onBackClick = { navController.popBackStack() }
             )
         }
     }
