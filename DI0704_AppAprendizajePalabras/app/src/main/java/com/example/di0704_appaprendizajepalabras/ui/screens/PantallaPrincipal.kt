@@ -5,61 +5,95 @@ import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Book
+import androidx.compose.material.icons.filled.Assessment
+import androidx.compose.material.icons.filled.Gamepad
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Translate
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Badge
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SuggestionChip
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.di0704_appaprendizajepalabras.data.model.Palabra
 import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 import kotlinx.coroutines.launch
-import coil.compose.AsyncImage
 import kotlin.math.abs
-import androidx.compose.material.icons.filled.Gamepad // <-- AÑADE ESTO
-import androidx.compose.material.icons.filled.Menu
 
+/**
+ * PANTALLA PRINCIPAL:
+ * Es el tablero central de la app. Gestiona el menú lateral, el sensor de agitado
+ * y muestra la palabra actual.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PantallaPrincipal(
     viewModel: PalabraViewModel,
     onNavigateToSettings: () -> Unit,
     onNavigateToDictionary: () -> Unit,
-    onNavigateToGame: () -> Unit // <-- AÑADE ESTE PARÁMETRO
+    onNavigateToGame: () -> Unit
 ) {
-    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val palabra = viewModel.palabraActual.value
+    // ESTADOS DE UI
+    val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed) // Estado del menú (abierto/cerrado)
+    val scope = rememberCoroutineScope() // Necesario para lanzar animaciones (como abrir el menú)
+    val context = LocalContext.current // Acceso al contexto de Android para usar los sensores
+    val palabra = viewModel.palabraActual.value // Palabra que estamos mostrando actualmente
 
-    // --- EXTRA 5: LÓGICA DEL SENSOR DE AGITADO (SHAKE) ---
-
+    /**
+     * EXTRA 5: SENSOR DE AGITADO (SHAKE)
+     * 'DisposableEffect' es perfecto para sensores. Cuando entras en la pantalla,
+     * activa el acelerómetro. Cuando sales de la pantalla (onDispose), lo apaga
+     * automáticamente para no gastar batería.
+     */
     DisposableEffect(Unit) {
         val sensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         val accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
 
         val sensorListener = object : SensorEventListener {
             private var lastUpdate: Long = 0
-            private var lastX = 0f
-            private var lastY = 0f
-            private var lastZ = 0f
-            private val SHAKE_THRESHOLD = 800 // Ajustado para mejor respuesta en emulador/físico
+            private var lastX = 0f; private var lastY = 0f; private var lastZ = 0f
+            private val SHAKE_THRESHOLD = 800 // Sensibilidad del agitado
 
             override fun onSensorChanged(event: SensorEvent) {
                 val curTime = System.currentTimeMillis()
+                // Solo comprobamos el movimiento cada 100 milisegundos para ahorrar procesador
                 if ((curTime - lastUpdate) > 100) {
                     val diffTime = curTime - lastUpdate
                     lastUpdate = curTime
@@ -68,10 +102,11 @@ fun PantallaPrincipal(
                     val y = event.values[1]
                     val z = event.values[2]
 
+                    // Cálculo matemático para detectar un movimiento brusco (agitado)
                     val speed = abs(x + y + z - lastX - lastY - lastZ) / diffTime * 10000
 
                     if (speed > SHAKE_THRESHOLD) {
-                        viewModel.siguientePalabra()
+                        viewModel.siguientePalabra() // ¡Agitado detectado! Pedimos otra palabra
                     }
                     lastX = x; lastY = y; lastZ = z
                 }
@@ -79,15 +114,19 @@ fun PantallaPrincipal(
             override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
         }
 
+        // Registramos el "escuchador" del sensor
         sensorManager.registerListener(sensorListener, accelerometer, SensorManager.SENSOR_DELAY_NORMAL)
 
         onDispose {
+            // MUY IMPORTANTE: Quitamos el listener al salir para evitar fugas de memoria
             sensorManager.unregisterListener(sensorListener)
         }
     }
 
-    // --- ESTRUCTURA DE NAVEGACIÓN LATERAL (DRAWER) ---
-
+    /**
+     * ESTRUCTURA DE NAVEGACIÓN LATERAL (DRAWER)
+     * El 'ModalNavigationDrawer' envuelve a toda la pantalla para permitir el menú deslizante.
+     */
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
@@ -100,43 +139,43 @@ fun PantallaPrincipal(
                 )
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                // Item: Inicio
+                // BOTÓN: INICIO
                 NavigationDrawerItem(
                     label = { Text("Inicio") },
-                    icon = { Icon(Icons.Default.Home, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Home, null) },
                     selected = true,
                     onClick = { scope.launch { drawerState.close() } },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // Item: Diccionario (Extra 1)
+                // BOTÓN: MI PROGRESO (Extra 1 y 4)
                 NavigationDrawerItem(
-                    label = { Text("Palabras Aprendidas") },
-                    icon = { Icon(Icons.Default.Book, contentDescription = null) },
+                    label = { Text("Mi Progreso") },
+                    icon = { Icon(Icons.Default.Assessment, null) },
                     selected = false,
                     onClick = {
-                        scope.launch { drawerState.close() }
+                        scope.launch { drawerState.close() } // Cerramos el menú antes de irnos
                         onNavigateToDictionary()
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // --- AQUÍ VA EL NUEVO CÓDIGO DEL JUEGO ---
+                // BOTÓN: MINI JUEGO (Extra 3)
                 NavigationDrawerItem(
                     label = { Text("Mini Juego") },
                     selected = false,
-                    icon = { Icon(Icons.Default.Gamepad, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Gamepad, null) },
                     onClick = {
                         scope.launch { drawerState.close() }
-                        onNavigateToGame() // Esto activa la navegación que definimos en AppNavigation
+                        onNavigateToGame()
                     },
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
                 )
 
-                // Item: Configuración
+                // BOTÓN: CONFIGURACIÓN
                 NavigationDrawerItem(
                     label = { Text("Configuración") },
-                    icon = { Icon(Icons.Default.Settings, contentDescription = null) },
+                    icon = { Icon(Icons.Default.Settings, null) },
                     selected = false,
                     onClick = {
                         scope.launch { drawerState.close() }
@@ -147,6 +186,7 @@ fun PantallaPrincipal(
             }
         }
     ) {
+        // CONTENIDO VISIBLE DE LA PANTALLA
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
@@ -155,18 +195,12 @@ fun PantallaPrincipal(
                         IconButton(onClick = { scope.launch { drawerState.open() } }) {
                             Icon(Icons.Default.Menu, contentDescription = "Abrir Menú")
                         }
-                    },
-                    colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                    )
+                    }
                 )
             }
         ) { paddingValues ->
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
+            Box(modifier = Modifier.fillMaxSize().padding(paddingValues)) {
+                // Llamamos al componente que dibuja la palabra actual
                 ContenidoPalabra(
                     palabra = palabra,
                     idioma = viewModel.idiomaActual,
@@ -178,81 +212,50 @@ fun PantallaPrincipal(
     }
 }
 
+/**
+ * COMPONENTE: ContenidoPalabra
+ * Se encarga exclusivamente de la parte visual de la palabra: imagen, término y definición.
+ */
 @Composable
 fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClick: () -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
+        modifier = Modifier.fillMaxSize().padding(24.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // --- INDICADORES SUPERIORES (Estadísticas e Idioma) ---
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
+        // CHIPS SUPERIORES
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             SuggestionChip(
                 onClick = { },
                 label = { Text("Practicando: $idioma") },
                 icon = { Icon(Icons.Default.Translate, null, modifier = Modifier.size(16.dp)) }
             )
-
-            Badge(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-                contentColor = MaterialTheme.colorScheme.onSecondaryContainer
-            ) {
-                Text(
-                    text = "Vistas: $contador",
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                    fontWeight = FontWeight.Bold
-                )
+            // Muestra cuántas palabras llevamos en la sesión
+            Badge(containerColor = MaterialTheme.colorScheme.secondaryContainer) {
+                Text("Vistas: $contador", modifier = Modifier.padding(8.dp), fontWeight = FontWeight.Bold)
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // --- TARJETA DE CONTENIDO ---
+        // TARJETA DE LA PALABRA
         ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge,
-            colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surface)
+            shape = MaterialTheme.shapes.extraLarge
         ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(modifier = Modifier.padding(16.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                // Coil carga la imagen de la palabra
                 AsyncImage(
                     model = palabra.imagenUrl,
-                    contentDescription = "Imagen de ${palabra.termino}",
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(220.dp),
-                    error = painterResource(android.R.drawable.ic_dialog_alert),
-                    placeholder = painterResource(android.R.drawable.ic_menu_report_image),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth().height(220.dp),
                     contentScale = ContentScale.Fit
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                Text(
-                    text = palabra.termino,
-                    fontSize = 36.sp,
-                    fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary,
-                    textAlign = TextAlign.Center
-                )
-
-                Spacer(modifier = Modifier.height(12.dp))
-
-                Text(
-                    text = palabra.definicion,
-                    fontSize = 18.sp,
-                    textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    lineHeight = 24.sp,
-                    modifier = Modifier.padding(horizontal = 8.dp)
-                )
+                Text(palabra.termino, fontSize = 36.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+                Text(palabra.definicion, fontSize = 18.sp, textAlign = TextAlign.Center, modifier = Modifier.padding(horizontal = 8.dp))
 
                 Spacer(modifier = Modifier.height(16.dp))
             }
@@ -260,42 +263,12 @@ fun ContenidoPalabra(palabra: Palabra, idioma: String, contador: Int, onNextClic
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        // --- BOTÓN Y AYUDA VISUAL ---
-        Button(
-            onClick = onNextClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = MaterialTheme.shapes.medium
-        ) {
-            Text("Siguiente palabra", fontSize = 18.sp)
+        Button(onClick = onNextClick, modifier = Modifier.fillMaxWidth().height(56.dp)) {
+            Text("Siguiente palabra")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(
-            text = "💡 ¡Agita tu dispositivo para cambiar de palabra!",
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.outline,
-            textAlign = TextAlign.Center
-        )
+        Text("💡 ¡Agita tu dispositivo para cambiar de palabra!", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.outline)
     }
-}
-
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun PantallaPrincipalPreview() {
-    val palabraPrueba = Palabra(
-        id = 1,
-        termino = "Resiliencia",
-        definicion = "Capacidad de adaptación frente a un agente perturbador.",
-        idioma = "Español",
-        imagenUrl = ""
-    )
-    ContenidoPalabra(
-        palabra = palabraPrueba,
-        idioma = "Español",
-        contador = 12,
-        onNextClick = {}
-    )
 }

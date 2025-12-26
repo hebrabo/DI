@@ -13,15 +13,32 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 
+/**
+ * PANTALLA DEL MINI JUEGO:
+ * Aquí el usuario pone a prueba lo aprendido asociando términos con sus definiciones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
-    // Generar el primer reto al entrar en la pantalla
-    LaunchedEffect(Unit) { viewModel.generarNuevoReto() }
 
+    /**
+     * 1. INICIALIZACIÓN:
+     * 'LaunchedEffect' con clave 'Unit' se ejecuta una sola vez cuando se entra en la pantalla.
+     * Sirve para pedirle al ViewModel que prepare la primera pregunta (el reto).
+     */
+    LaunchedEffect(Unit) {
+        viewModel.generarNuevoReto()
+    }
+
+    // --- ESTADOS DE LA PANTALLA ---
+    // Obtenemos el reto actual (palabra + 3 opciones) del ViewModel
     val quiz = viewModel.quizActual.value
+
+    // Guardamos el texto de "¡Correcto!" o "Casi..." para mostrarlo abajo
     var mensajeResultado by remember { mutableStateOf("") }
-    // Estado para bloquear botones tras responder una vez
+
+    // Este booleano es clave: evita que el usuario pulse varios botones a la vez
+    // o que sume puntos infinitos pulsando muchas veces la respuesta correcta.
     var respondido by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -44,6 +61,7 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
+            // 'let' comprueba que 'quiz' no sea nulo antes de pintar la UI
             quiz?.let { q ->
                 Text(
                     text = "¿Cuál es la definición de:",
@@ -61,17 +79,20 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Lista de opciones
+                /**
+                 * 2. GENERACIÓN DINÁMICA DE BOTONES:
+                 * Recorremos la lista de 3 opciones (mezcladas previamente en el ViewModel).
+                 */
                 q.opciones.forEach { opcion ->
                     val esCorrecta = opcion == q.respuestaCorrecta
 
                     Button(
                         onClick = {
-                            if (!respondido) { // Solo procesamos si no ha respondido aún
+                            if (!respondido) { // Solo permitimos un intento por reto
                                 respondido = true
                                 if (esCorrecta) {
                                     mensajeResultado = "¡Correcto! 🎉"
-                                    viewModel.registrarAcierto() // ACTUALIZA EXTRA 4
+                                    viewModel.registrarAcierto() // Sumamos a las estadísticas
                                 } else {
                                     mensajeResultado = "Casi... era otra ❌"
                                 }
@@ -80,9 +101,15 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 6.dp),
-                        enabled = !respondido, // Desactiva botones tras la respuesta
+                        // Desactivamos el botón si ya se ha respondido
+                        enabled = !respondido,
                         shape = MaterialTheme.shapes.large,
                         colors = ButtonDefaults.buttonColors(
+                            /**
+                             * LÓGICA DE COLORES POST-RESPUESTA:
+                             * Si ya respondió y esta era la correcta, se pone en color Primario (azul/verde).
+                             * Si no, se queda en el color secundario estándar.
+                             */
                             containerColor = if (respondido && esCorrecta)
                                 MaterialTheme.colorScheme.primary
                             else
@@ -101,7 +128,10 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
                     }
                 }
 
-                // Sección de feedback y siguiente reto
+                /**
+                 * 3. SECCIÓN DE FEEDBACK:
+                 * Solo aparece cuando el usuario ya ha hecho clic en una opción.
+                 */
                 if (respondido) {
                     Spacer(modifier = Modifier.height(24.dp))
 
@@ -117,6 +147,7 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Botón para resetear estados y pedir un nuevo reto al ViewModel
                     Button(
                         onClick = {
                             mensajeResultado = ""
@@ -129,7 +160,11 @@ fun JuegoScreen(viewModel: PalabraViewModel, onBackClick: () -> Unit) {
                     }
                 }
             } ?: run {
-                // Estado de carga si no hay palabras suficientes
+                /**
+                 * 4. ESTADO DE ESPERA:
+                 * Mientras el ViewModel prepara las palabras (o si hay un retraso),
+                 * mostramos un círculo de carga para no dejar la pantalla vacía.
+                 */
                 CircularProgressIndicator()
                 Text("Preparando el desafío...", modifier = Modifier.padding(top = 16.dp))
             }

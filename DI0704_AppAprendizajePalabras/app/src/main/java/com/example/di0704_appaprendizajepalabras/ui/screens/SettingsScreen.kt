@@ -8,13 +8,16 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.di0704_appaprendizajepalabras.ui.viewmodel.PalabraViewModel
 
+/**
+ * 1. COMPOSABLE DE CONEXIÓN (BRIDGE):
+ * Esta función conecta el ViewModel con la interfaz.
+ * Separamos la lógica (ViewModel) de la visualización (Content) para que
+ * el código sea más fácil de probar y mantener.
+ */
 @Composable
 fun SettingsScreen(
     viewModel: PalabraViewModel,
@@ -22,21 +25,23 @@ fun SettingsScreen(
     onDarkModeChange: (Boolean) -> Unit,
     onBackClick: () -> Unit
 ) {
+    // Solo pasamos a la UI lo que realmente necesita configurar.
+    // Las estadísticas (racha, aciertos) ya no se pasan aquí porque se movieron a "Mi Progreso".
     SettingsContent(
         isDarkMode = isDarkMode,
         onDarkModeChange = onDarkModeChange,
         onBackClick = onBackClick,
         idiomaActual = viewModel.idiomaActual,
         onIdiomaChange = { viewModel.cambiarIdioma(it) },
-        onDeleteProgress = { viewModel.borrarProgreso() },
-        // Pasamos los nuevos datos del Extra 4
-        racha = viewModel.rachaDias,
-        juegosGanados = viewModel.juegosSuperados,
-        palabrasVistas = viewModel.palabrasVistas,
-        sesiones = viewModel.totalSesiones
+        onDeleteProgress = { viewModel.borrarProgreso() }
     )
 }
 
+/**
+ * 2. COMPOSABLE DE INTERFAZ (UI):
+ * Contiene el diseño puro. No sabe qué es un ViewModel, solo recibe datos y
+ * emite eventos cuando el usuario pulsa botones.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsContent(
@@ -45,14 +50,14 @@ fun SettingsContent(
     onBackClick: () -> Unit,
     idiomaActual: String,
     onIdiomaChange: (String) -> Unit,
-    onDeleteProgress: () -> Unit,
-    racha: Int,
-    juegosGanados: Int,
-    palabrasVistas: Int,
-    sesiones: Int
+    onDeleteProgress: () -> Unit
 ) {
+    // ESTADOS LOCALES:
+    // 'showDialog' controla el cartel de confirmación.
+    // 'expanded' controla si el menú de idiomas está abierto.
     var showDialog by remember { mutableStateOf(false) }
     var expanded by remember { mutableStateOf(false) }
+
     val idiomas = listOf("Español", "Inglés")
 
     Scaffold(
@@ -74,22 +79,35 @@ fun SettingsContent(
                 .padding(24.dp)
         ) {
             // --- SECCIÓN: APARIENCIA ---
-            Text(text = "Apariencia", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = "Apariencia",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = "Modo Noche", fontSize = 18.sp)
+                // Switch: Componente visual para estados On/Off
                 Switch(checked = isDarkMode, onCheckedChange = onDarkModeChange)
             }
 
+            // Divisor visual para separar secciones
             HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
 
             // --- SECCIÓN: APRENDIZAJE ---
-            Text(text = "Aprendizaje", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+            Text(
+                text = "Aprendizaje",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary
+            )
             Spacer(modifier = Modifier.height(16.dp))
+
+            // Contenedor para el Menú Desplegable (Dropdown)
             ExposedDropdownMenuBox(
                 expanded = expanded,
                 onExpandedChange = { expanded = !expanded }
@@ -97,82 +115,93 @@ fun SettingsContent(
                 OutlinedTextField(
                     value = idiomaActual,
                     onValueChange = {},
-                    readOnly = true,
+                    readOnly = true, // El usuario no escribe, solo elige de la lista
                     label = { Text("Idioma a practicar") },
                     trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                    modifier = Modifier.menuAnchor().fillMaxWidth(),
+
+                    // menuAnchor: Indica a Compose dónde debe "pegarse" el menú flotante.
+                    // Usamos 'PrimaryNotEditable' porque el campo es de solo lectura.
+                    modifier = Modifier
+                        .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
+                        .fillMaxWidth(),
+
                     leadingIcon = { Icon(Icons.Default.Language, contentDescription = null) }
                 )
-                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+
+                // El menú que se despliega con las opciones
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
                     idiomas.forEach { idioma ->
                         DropdownMenuItem(
                             text = { Text(idioma) },
-                            onClick = { onIdiomaChange(idioma); expanded = false }
+                            onClick = {
+                                onIdiomaChange(idioma) // Notifica el cambio al ViewModel
+                                expanded = false
+                            }
                         )
                     }
                 }
             }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 16.dp))
+            /**
+             * ESPACIADO FIJO:
+             * Usamos un alto fijo (64.dp) para que la "Zona de peligro" no se vaya
+             * al final de la pantalla ahora que hay menos elementos.
+             */
+            Spacer(modifier = Modifier.height(64.dp))
 
-            // --- EXTRA 4: DASHBOARD DE ESTADÍSTICAS ---
-            Text(text = "Tu Progreso", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
-            Spacer(modifier = Modifier.height(12.dp))
-
-            ElevatedCard(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.elevatedCardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
-            ) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    StatRow(icon = Icons.Default.LocalFireDepartment, label = "Racha actual", value = "$racha días", color = MaterialTheme.colorScheme.error)
-                    StatRow(icon = Icons.Default.EmojiEvents, label = "Juegos ganados", value = "$juegosGanados")
-                    StatRow(icon = Icons.Default.Visibility, label = "Palabras vistas", value = "$palabrasVistas")
-                    StatRow(icon = Icons.Default.History, label = "Sesiones totales", value = "$sesiones")
-                }
-            }
-
-            Spacer(modifier = Modifier.weight(1f)) // Empuja lo siguiente al final
-
-            // --- SECCIÓN: PELIGRO ---
-            Text(text = "Zona de peligro", style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.error)
+            // --- SECCIÓN: PELIGRO (Acciones irreversibles) ---
+            Text(
+                text = "Zona de peligro",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.error
+            )
             Spacer(modifier = Modifier.height(8.dp))
+
             Button(
-                onClick = { showDialog = true },
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
+                onClick = { showDialog = true }, // Abrimos el diálogo de confirmación
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.error
+                ),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Icon(Icons.Default.Delete, contentDescription = null)
                 Spacer(Modifier.width(8.dp))
-                Text("Restablecer progreso")
+                Text("Restablecer todo el progreso")
             }
         }
 
+        /**
+         * DIÁLOGO DE CONFIRMACIÓN (AlertDialog):
+         * Solo aparece si el usuario pulsa el botón de borrar.
+         * Es una barrera de seguridad fundamental en UX.
+         */
         if (showDialog) {
             AlertDialog(
-                onDismissRequest = { showDialog = false },
+                onDismissRequest = { showDialog = false }, // Se cierra si pulsas fuera
                 icon = { Icon(Icons.Default.Warning, contentDescription = null) },
-                title = { Text("¿Reiniciar todo?") },
-                text = { Text("Perderás tu racha de $racha días y tus $juegosGanados juegos ganados.") },
+                title = { Text("¿Estás completamente seguro?") },
+                text = {
+                    Text("Se borrarán tus estadísticas, racha y palabras aprendidas. Esta acción no se puede deshacer.")
+                },
                 confirmButton = {
-                    TextButton(onClick = { onDeleteProgress(); showDialog = false }) {
-                        Text("Confirmar", color = MaterialTheme.colorScheme.error)
+                    // Acción de confirmar borrado
+                    TextButton(onClick = {
+                        onDeleteProgress() // Llama a la lógica de reset del ViewModel
+                        showDialog = false
+                    }) {
+                        Text("Borrar todo", color = MaterialTheme.colorScheme.error)
                     }
                 },
-                dismissButton = { TextButton(onClick = { showDialog = false }) { Text("Cancelar") } }
+                dismissButton = {
+                    // Acción de cancelar
+                    TextButton(onClick = { showDialog = false }) {
+                        Text("Cancelar")
+                    }
+                }
             )
         }
-    }
-}
-
-@Composable
-fun StatRow(icon: ImageVector, label: String, value: String, color: androidx.compose.ui.graphics.Color = MaterialTheme.colorScheme.onSurfaceVariant) {
-    Row(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(icon, contentDescription = null, tint = color, modifier = Modifier.size(20.dp))
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(text = label, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.weight(1f))
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
     }
 }
