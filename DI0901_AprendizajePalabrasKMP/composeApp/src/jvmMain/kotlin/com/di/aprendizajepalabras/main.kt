@@ -3,11 +3,14 @@ package com.di.aprendizajepalabras
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 
+/**
+ * Punto de entrada para la versión de Escritorio (PC).
+ */
 fun main() = application {
     Window(
         onCloseRequest = ::exitApplication,
-        title = "DI0901_AprendizajePalabrasKMP",
+        title = "Aprendizaje ABN - Palabras", // Título de la ventana
     ) {
-        App()
+        App() // Aquí llamamos a tu función App() que está en commonMain
     }
 }

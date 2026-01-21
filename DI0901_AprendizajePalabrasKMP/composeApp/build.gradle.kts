@@ -15,16 +15,11 @@ kotlin {
             jvmTarget.set(JvmTarget.JVM_11)
         }
     }
-    
+
+    // Activa la versión de escritorio
     jvm()
-    
+
     sourceSets {
-        androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
-            implementation(libs.androidx.activity.compose)
-            implementation("io.ktor:ktor-client-okhttp:3.3.3")
-            implementation("io.ktor:ktor-client-java:3.3.3")
-        }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
             implementation(libs.compose.foundation)
@@ -34,17 +29,31 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
-            implementation("androidx.navigation:navigation-compose:2.9.6")
+
+            // NAVEGACIÓN: Usamos la versión de JetBrains para que funcione en PC
+            implementation("org.jetbrains.androidx.navigation:navigation-compose:2.9.1")
+
             implementation("org.jetbrains.compose.material:material-icons-extended:1.7.1")
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
         }
-        commonTest.dependencies {
-            implementation(libs.kotlin.test)
+
+        androidMain.dependencies {
+            implementation(libs.compose.uiToolingPreview)
+            implementation(libs.androidx.activity.compose)
+            // Motor de red exclusivo para Android
+            implementation("io.ktor:ktor-client-okhttp:3.3.3")
         }
+
         jvmMain.dependencies {
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
+            // Motor de red exclusivo para Desktop (PC)
+            implementation("io.ktor:ktor-client-java:3.3.3")
+        }
+
+        commonTest.dependencies {
+            implementation(libs.kotlin.test)
         }
     }
 }
@@ -65,11 +74,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -82,6 +86,7 @@ dependencies {
 
 compose.desktop {
     application {
+        // Asegúrate de que este sea el nombre de tu archivo main.kt y su paquete
         mainClass = "com.di.aprendizajepalabras.MainKt"
 
         nativeDistributions {
